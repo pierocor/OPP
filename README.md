@@ -1,5 +1,28 @@
 # Optimization and Parallelization Project
 
+### README
+
+This package contains simplified MD code with multi-threading
+parallelization for simulating atoms with a Lennard-Jones potential.
+
+The bundled makefiles are set up to compile the executable once
+with OpenMP disabled and once with OpenMP enabled with each build
+placing the various object files in separate directories.
+
+The examples directory contains 3 sets of example input decks
+and the reference directory the corresponding outputs.
+
+Type: make
+to compile everything and: make clean
+to remove all compiled objects
+
+### Team
+
+Piero Coronica (pierocor)
+Aurora Maurizio (auroramaurizio)
+Rajat Panda (rjtkp)
+
+
 You will work in this assignment in small groups with 3 or 4 members. The evaluation will be based in part (1/3rd) on the performance of the group as a total and also based on the individual contributions as evidenced by the commits to the project (2/3rd). Please add a list of the group members and how their names will show up in the commit messages to the README file, so that your commits will be properly attributed.
 ### Tasks for the entire group (to be completed within the first 1⁄2 day)
 Set up a shared git repository using the code from D3-exercise/ljmd-c.tar.gz so that all members of your group have write access (i.e. can push into this repository). Then each member clones this repository. You will work in your local repository on temporary branches, merge them into your local master when done and push your changes (after pulling changes from other group members, if needed).
