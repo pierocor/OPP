@@ -1,6 +1,7 @@
-#include "../include/velocity_verlet.h"
-#include <math.h>
 
+#include <math.h>
+#include <data.h>
+#include <velocity_verlet.h>
 /* velocity verlet Part1 */
 static void velverlet1(mdsys_t *sys)
 {
@@ -16,5 +17,3 @@ static void velverlet1(mdsys_t *sys)
         sys->rz[i] += sys->dt*sys->vz[i];
     }
 }
-    
-

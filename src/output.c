@@ -1,13 +1,14 @@
-#include "../include/velocity_verlet.h"
+
 #include <stdio>
 #include <stdlib>
-
+#include <data.h>
+#include <velocity_verlet.h>
 
 /* append data to output. */
 static void output(mdsys_t *sys, FILE *erg, FILE *traj)
 {
     int i;
-    
+
     printf("% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n", sys->nfi, sys->temp, sys->ekin, sys->epot, sys->ekin+sys->epot);
     fprintf(erg,"% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n", sys->nfi, sys->temp, sys->ekin, sys->epot, sys->ekin+sys->epot);
     fprintf(traj,"%d\n nfi=%d etot=%20.8f\n", sys->natoms, sys->nfi, sys->ekin+sys->epot);
@@ -15,4 +16,3 @@ static void output(mdsys_t *sys, FILE *erg, FILE *traj)
         fprintf(traj, "Ar  %20.8f %20.8f %20.8f\n", sys->rx[i], sys->ry[i], sys->rz[i]);
     }
 }
-

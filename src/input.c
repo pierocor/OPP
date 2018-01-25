@@ -1,5 +1,6 @@
-#include "../include/input.h"
-
+#include <velocity_verlet.h>
+#include <stdio>
+#include <stdlib>
 
 /* helper function: read a line and then return
    the first string with whitespace stripped off */

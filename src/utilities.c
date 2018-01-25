@@ -1,7 +1,8 @@
-#include <velocity_verlet.h>
+
 #include <stdio>
 #include <stdlib>
-
+#include <data.h>
+#include <velocity_verlet.h>
 /* helper function: zero out an array */
 static void azzero(double *d, const int n)
 {
@@ -21,7 +22,7 @@ static double pbc(double x, const double boxby2)
 
 /* compute kinetic energy */
 static void ekin(mdsys_t *sys)
-{   
+{
     int i;
 
     sys->ekin=0.0;
@@ -30,4 +31,3 @@ static void ekin(mdsys_t *sys)
     }
     sys->temp = 2.0*sys->ekin/(3.0*sys->natoms-3.0)/kboltz;
 }
-
