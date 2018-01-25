@@ -13,6 +13,10 @@ serial:
 clean:
 	$(MAKE) $(MFLAGS) -C Obj-serial clean
 	$(MAKE) $(MFLAGS) -C examples clean
+	$(MAKE) $(MFLAGS) -C unit_test/force clean
 
 check: serial
 	$(MAKE) $(MFLAGS) -C examples check
+
+check_force:
+	$(MAKE) $(MFLAGS) -C unit_test/force check
