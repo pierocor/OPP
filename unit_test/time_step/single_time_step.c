@@ -22,13 +22,12 @@ extern const double mvsq2e;
 /* main */
 int main(int argc, char **argv)
 {
-    int i;
-    // char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
+    int  i;
     FILE *fp;
     mdsys_t sys;
 
     /* pre-filled sys with selected values */
-    sys.natoms = 3;
+    sys.natoms = 10;
     sys.mass = 39.948;
     sys.epsilon = 0.2379;
     sys.sigma = 3.405;
@@ -36,6 +35,7 @@ int main(int argc, char **argv)
     sys.box = 17.158;
     sys.nsteps = 1;
     sys.dt  = 5.0;
+
 
     /* allocate memory */
     sys.rx=(double *)malloc(sys.natoms*sizeof(double));
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     sys.fz=(double *)malloc(sys.natoms*sizeof(double));
 
     /* read restart */
-    fp=fopen("argon_3.rest","r");
+    fp=fopen("argon_time_step.rest","r");
     if(fp) {
         for (i=0; i<sys.natoms; ++i) {
             fscanf(fp,"%lf%lf%lf",sys.rx+i, sys.ry+i, sys.rz+i);
@@ -68,18 +68,35 @@ int main(int argc, char **argv)
 
     /* initialize forces and energies.*/
     sys.nfi=0;
-    force(&sys);
-
     printf("Starting simulation with %d atoms for %d steps.\n",sys.natoms, sys.nsteps);
-    printf("\tFx \t\tFy \t\tFz \n");
-    fp=fopen("force_test.dat","w");
+    printf("\tVx \t\tVy \t\tVz \n");
     for (i=0; i<sys.natoms; ++i) {
-      printf("\t%f \t%f \t%f \n", sys.fx[i], sys.fy[i], sys.fz[i]);
-      fprintf(fp, "\t%f \t%f \t%f \n", sys.fx[i], sys.fy[i], sys.fz[i]);
+      printf("\t%f \t%f \t%f \n", sys.vx[i], sys.vy[i], sys.vz[i]);
+      fprintf(fp, "\t%f \t%f \t%f \n", sys.vx[i], sys.vy[i], sys.vz[i]);
+    }
+
+
+    /**************************************************/
+    /* main MD loop */
+    for(sys.nfi=1; sys.nfi <= sys.nsteps; ++sys.nfi) {
+
+      /* propagate system and recompute energies */
+      velverlet1(&sys);
+      velverlet2(&sys);
+      ekin(&sys);
+    }
+    /**************************************************/
+
+    fp=fopen("single_time_step.dat","w");
+    for (i=0; i<sys.natoms; ++i) {
+      // printf("\t%f \t%f \t%f \n", sys.vx[i], sys.vy[i], sys.vz[i]);
+      fprintf(fp, "\t%f \t%f \t%f \n", sys.vx[i], sys.vy[i], sys.vz[i]);
     }
     fclose(fp);
+
     /* clean up: close files, free memory */
     printf("Simulation Done.\n");
+
     free(sys.rx);
     free(sys.ry);
     free(sys.rz);
