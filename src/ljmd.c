@@ -21,7 +21,7 @@ const double mvsq2e=2390.05736153349; /* m*v^2 in kcal/mol */
 /* structure to hold the complete information 
  * about the MD system */
 struct _mdsys {
-    int natoms,nfi,nsteps;
+    int natoms,nfi,nsteps;      /* nfi is the current step.*/
     double dt, mass, epsilon, sigma, box, rcut;
     double ekin, epot, temp;
     double *rx, *ry, *rz;
@@ -95,9 +95,9 @@ static void force(mdsys_t *sys)
     double rx,ry,rz;
     int i,j;
 
-    /* zero energy and forces */
+    /* zero energy and forces. azzero initiates everything to zero. */
     sys->epot=0.0;
-    azzero(sys->fx,sys->natoms);
+    azzero(sys->fx,sys->natoms); 
     azzero(sys->fy,sys->natoms);
     azzero(sys->fz,sys->natoms);
 
