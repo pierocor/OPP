@@ -22,33 +22,20 @@ extern const double mvsq2e;
 /* main */
 int main(int argc, char **argv)
 {
-    int nprint, i;
-    char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
-    FILE *fp,*traj,*erg;
+    int i;
+    // char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
+    FILE *fp;
     mdsys_t sys;
 
-    /* read input file */
-    if(get_a_line(stdin,line)) return 1;
-    sys.natoms=atoi(line);
-    if(get_a_line(stdin,line)) return 1;
-    sys.mass=atof(line);
-    if(get_a_line(stdin,line)) return 1;
-    sys.epsilon=atof(line);
-    if(get_a_line(stdin,line)) return 1;
-    sys.sigma=atof(line);
-    if(get_a_line(stdin,line)) return 1;
-    sys.rcut=atof(line);
-    if(get_a_line(stdin,line)) return 1;
-    sys.box=atof(line);
-    if(get_a_line(stdin,restfile)) return 1;
-    if(get_a_line(stdin,trajfile)) return 1;
-    if(get_a_line(stdin,ergfile)) return 1;
-    if(get_a_line(stdin,line)) return 1;
-    sys.nsteps=atoi(line);
-    if(get_a_line(stdin,line)) return 1;
-    sys.dt=atof(line);
-    if(get_a_line(stdin,line)) return 1;
-    nprint=atoi(line);
+    /* pre-filled sys with selected values */
+    sys.natoms = 3;
+    sys.mass = 39.948;
+    sys.epsilon = .2379;
+    sys.sigma = 3.405;
+    sys.rcut = 8.5;
+    sys.box = 17.158;
+    sys.nsteps = 1;
+    sys.dt  = 5.0;
 
     /* allocate memory */
     sys.rx=(double *)malloc(sys.natoms*sizeof(double));
@@ -62,7 +49,7 @@ int main(int argc, char **argv)
     sys.fz=(double *)malloc(sys.natoms*sizeof(double));
 
     /* read restart */
-    fp=fopen(restfile,"r");
+    fp=fopen("argon_3.rest","r");
     if(fp) {
         for (i=0; i<sys.natoms; ++i) {
             fscanf(fp,"%lf%lf%lf",sys.rx+i, sys.ry+i, sys.rz+i);
@@ -82,37 +69,17 @@ int main(int argc, char **argv)
     /* initialize forces and energies.*/
     sys.nfi=0;
     force(&sys);
-    ekin(&sys);
-
-    erg=fopen(ergfile,"w");
-    traj=fopen(trajfile,"w");
 
     printf("Starting simulation with %d atoms for %d steps.\n",sys.natoms, sys.nsteps);
-    printf("     NFI            TEMP            EKIN                 EPOT              ETOT\n");
-    output(&sys, erg, traj);
-
-    /**************************************************/
-    /* main MD loop */
-    for(sys.nfi=1; sys.nfi <= sys.nsteps; ++sys.nfi) {
-
-        /* write output, if requested */
-        if ((sys.nfi % nprint) == 0)
-            output(&sys, erg, traj);
-
-        /* propagate system and recompute energies */
-        velverlet1(&sys);
-        force(&sys);
-        velverlet2(&sys);
-
-        ekin(&sys);
+    printf("\tFx \t\tFy \t\tFz \n");
+    fp=fopen("force_test.dat","w");
+    for (i=0; i<sys.natoms; ++i) {
+      printf("\t%f \t%f \t%f \n", sys.fx[i], sys.fy[i], sys.fz[i]);
+      fprintf(fp, "\t%f \t%f \t%f \n", sys.fx[i], sys.fy[i], sys.fz[i]);
     }
-    /**************************************************/
-
+    fclose(fp);
     /* clean up: close files, free memory */
     printf("Simulation Done.\n");
-    fclose(erg);
-    fclose(traj);
-
     free(sys.rx);
     free(sys.ry);
     free(sys.rz);
