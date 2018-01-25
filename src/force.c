@@ -1,5 +1,7 @@
-#include "../include/velocity_verlet.h"
+
 #include <math.h>
+#include <data.h>
+#include <velocity_verlet.h>
 
 /* compute forces */
 static void force(mdsys_t *sys)

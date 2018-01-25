@@ -5,5 +5,6 @@
 static void velverlet1(mdsys_t *sys)
 static void velverlet2(mdsys_t *sys)
 static void force(mdsys_t *sys)
+static int get_a_line(FILE *fp, char *buf)
 
 #endif
