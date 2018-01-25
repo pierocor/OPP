@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <data.h>
+#include <string.h>
+#include <ctype.h>
+
 
 
 /* helper function: read a line and then return

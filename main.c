@@ -16,8 +16,8 @@
 
 
 /* a few physical constants */
-// extern const double kboltz;
-// extern const double mvsq2e;
+extern const double kboltz;
+extern const double mvsq2e;
 
 /* main */
 int main(int argc, char **argv)
@@ -100,7 +100,10 @@ int main(int argc, char **argv)
             output(&sys, erg, traj);
 
         /* propagate system and recompute energies */
-        velverlet(&sys);
+        velverlet1(&sys);
+        force(&sys);
+        velverlet2(&sys);
+
         ekin(&sys);
     }
     /**************************************************/

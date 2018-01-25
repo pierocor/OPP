@@ -7,7 +7,7 @@ LDLIBS=-lm
 # list of source files
 SRC=../src/force.c ../src/input.c ../src/output.c ../src/utilities.c ../src/verlet1.c ../src/verlet2.c
 VPATH=../src
-OBJ=$(SRC:%.c=%.o)
+OBJ=force.o input.o main.o output.o utilities.o verlet1.o verlet2.o
 
 default: ../ljmd-serial.x
 
@@ -15,16 +15,15 @@ clean:
 	rm -f *.mod *.o ../ljmd-serial.x
 
 # linker rule
-../ljmd-serial.x: $(OBJ)
-	$(CC) -o $@ $(CFLAGS) $^ main.o $(LDLIBS)
+../ljmd-serial.x: $(OBJ) main.o
+	$(CC) -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects
 %.o: %.c
 	$(CC) -c $(CFLAGS) $<
 
-main.o: $(OBJ)
 
-../ljmd-serial.x: main.o
+
 
 main.o: ../main.c
 	$(CC) -c $(CFLAGS) $<
