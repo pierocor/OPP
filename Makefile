@@ -20,3 +20,6 @@ check: serial
 
 check_force:
 	$(MAKE) $(MFLAGS) -C unit_test/force check
+
+check_kinetic:
+	$(MAKE) $(MFLAGS) -C unit_test/kinetic check

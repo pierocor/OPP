@@ -9,3 +9,5 @@ compiler:
 
 script:
   - make check
+  - make check_force
+  - make check_kinetic
