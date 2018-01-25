@@ -1,11 +1,11 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
 CC=gcc
-CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer
+CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -I include
 LDLIBS=-lm
 
 # list of source files
-SRC=ljmd.c
+SRC=main.c
 VPATH=../src
 OBJ=$(SRC:%.c=%.o)
 
@@ -15,12 +15,14 @@ clean:
 	rm -f *.mod *.o ../ljmd-serial.x
 
 # linker rule
-../ljmd-serial.x: $(OBJ)
+../ljmd-serial.x: $(OBJ) main.o
 	$(CC) -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects
 %.o: %.c
 	$(CC) -c $(CFLAGS) $<
 
+main.o: ../main.c
+	$(CC) -c $(CFLAGS) $<
 # dependencies
 ljmd.o: ljmd.c
