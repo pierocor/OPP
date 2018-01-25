@@ -3,7 +3,7 @@
 #include <data.h>
 #include <velocity_verlet.h>
 /* velocity verlet part 2*/
-static void velverlet2(mdsys_t *sys)
+void velverlet2(mdsys_t *sys)
 {
     int i;
 

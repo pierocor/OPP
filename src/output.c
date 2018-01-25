@@ -1,11 +1,11 @@
 
-#include <stdio>
-#include <stdlib>
+#include <stdio.h>
+#include <stdlib.h>
 #include <data.h>
 #include <velocity_verlet.h>
 
 /* append data to output. */
-static void output(mdsys_t *sys, FILE *erg, FILE *traj)
+void output(mdsys_t *sys, FILE *erg, FILE *traj)
 {
     int i;
 
