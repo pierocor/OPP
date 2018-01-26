@@ -13,7 +13,10 @@
 #include <data.h>
 #include <velocity_verlet.h>
 
-
+#ifdef MPI
+#include <mpi.h>
+#define TAG 100
+#endif
 
 /* a few physical constants */
 extern const double kboltz;
@@ -27,6 +30,16 @@ int main(int argc, char **argv)
     FILE *fp,*traj,*erg;
     double t_start, t_stop;
     mdsys_t sys;
+
+#ifdef MPI
+MPI_Init(&argc, &argv);
+MPI_Comm_size(MPI_COMM_WORLD, &sys.size);
+MPI_Comm_rank(MPI_COMM_WORLD, &sys.rank);
+
+
+/* INPUT PARAMETER */
+if (  sys.rank == 0 ){
+#endif
 
     /* read input file */
     if(get_a_line(stdin,line)) return 1;
@@ -51,17 +64,61 @@ int main(int argc, char **argv)
     if(get_a_line(stdin,line)) return 1;
     nprint=atoi(line);
 
+#ifdef MPI
+}
+/* BROADCAST PARAMETER */
+MPI_Bcast( &sys.natoms, 1, MPI_INT, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.nfi, 1, MPI_INT, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.nsteps, 1, MPI_INT, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.dt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.mass, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.epsilon, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.sigma, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.box, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+MPI_Bcast( &sys.rcut, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+
+/* COMPUTING RANGES */
+// the standard range of a section is N/ sys.size
+// if N is not a multiple of  sys.size the first processes will have an extra atom
+sys.my_range = sys.natoms /  sys.size;
+if( sys.rank < (sys.natoms %  sys.size) )
+  sys.my_range++;
+sys.my_start = sys.rank * (sys.natoms / sys.size);
+if ( sys.rank < (sys.natoms % sys.size) )
+  sys.my_start += sys.rank;
+else
+  sys.my_start += (sys.natoms % sys.size);
+sys.my_end = sys.my_start + sys.my_range;
+#endif
+
     /* allocate memory */
     sys.rx=(double *)malloc(sys.natoms*sizeof(double));
     sys.ry=(double *)malloc(sys.natoms*sizeof(double));
     sys.rz=(double *)malloc(sys.natoms*sizeof(double));
+#ifdef MPI
+if (  sys.rank == 0 ){
+  sys.vx=(double *)malloc(sys.natoms*sizeof(double));
+  sys.vy=(double *)malloc(sys.natoms*sizeof(double));
+  sys.vz=(double *)malloc(sys.natoms*sizeof(double));
+  sys.fx=(double *)malloc(sys.natoms*sizeof(double));
+  sys.fy=(double *)malloc(sys.natoms*sizeof(double));
+  sys.fz=(double *)malloc(sys.natoms*sizeof(double));
+}else{
+  sys.fx=(double *)malloc(sys.my_range*sizeof(double));
+  sys.fy=(double *)malloc(sys.my_range*sizeof(double));
+  sys.fz=(double *)malloc(sys.my_range*sizeof(double));
+}
+
+if (  sys.rank == 0 ){
+#else
     sys.vx=(double *)malloc(sys.natoms*sizeof(double));
     sys.vy=(double *)malloc(sys.natoms*sizeof(double));
     sys.vz=(double *)malloc(sys.natoms*sizeof(double));
     sys.fx=(double *)malloc(sys.natoms*sizeof(double));
     sys.fy=(double *)malloc(sys.natoms*sizeof(double));
     sys.fz=(double *)malloc(sys.natoms*sizeof(double));
-
+#endif
     /* read restart */
     fp=fopen(restfile,"r");
     if(fp) {
@@ -83,7 +140,13 @@ int main(int argc, char **argv)
     t_start=cclock();
     /* initialize forces and energies.*/
     sys.nfi=0;
+#ifdef MPI
+}
+#endif
     force(&sys);
+#ifdef MPI
+if (  sys.rank == 0 ){
+#endif
     ekin(&sys);
 
     erg=fopen(ergfile,"w");
@@ -92,29 +155,47 @@ int main(int argc, char **argv)
     printf("Starting simulation with %d atoms for %d steps.\n",sys.natoms, sys.nsteps);
     printf("     NFI            TEMP            EKIN                 EPOT              ETOT\n");
     output(&sys, erg, traj);
-
+#ifdef MPI
+}
+#endif
     /**************************************************/
     /* main MD loop */
     for(sys.nfi=1; sys.nfi <= sys.nsteps; ++sys.nfi) {
-
+#ifdef MPI
+if (  sys.rank == 0 ){
+#endif
         /* write output, if requested */
         if ((sys.nfi % nprint) == 0)
             output(&sys, erg, traj);
 
         /* propagate system and recompute energies */
         velverlet1(&sys);
+#ifdef MPI
+}
+#endif
         force(&sys);
+#ifdef MPI
+if (  sys.rank == 0 ){
+#endif
         velverlet2(&sys);
 
         ekin(&sys);
+#ifdef MPI
+}
+#endif
     }
     /**************************************************/
+#ifdef MPI
+if (  sys.rank == 0 ){
+#endif
     t_stop=cclock();
     /* clean up: close files, free memory */
     printf("Simulation Done. Elapsed time: %9.4f secs\n", t_stop - t_start );
     fclose(erg);
     fclose(traj);
-
+#ifdef MPI
+}
+#endif
     free(sys.rx);
     free(sys.ry);
     free(sys.rz);
@@ -124,6 +205,8 @@ int main(int argc, char **argv)
     free(sys.fx);
     free(sys.fy);
     free(sys.fz);
-
+#ifdef MPI
+MPI_Finalize();
+#endif
     return 0;
 }
