@@ -25,6 +25,7 @@ int main(int argc, char **argv)
     int nprint, i;
     char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
     FILE *fp,*traj,*erg;
+    double t_start, t_stop;
     mdsys_t sys;
 
     /* read input file */
@@ -79,6 +80,7 @@ int main(int argc, char **argv)
         return 3;
     }
 
+    t_start=cclock();
     /* initialize forces and energies.*/
     sys.nfi=0;
     force(&sys);
@@ -107,9 +109,9 @@ int main(int argc, char **argv)
         ekin(&sys);
     }
     /**************************************************/
-
+    t_stop=cclock();
     /* clean up: close files, free memory */
-    printf("Simulation Done.\n");
+    printf("Simulation Done. Elapsed time: %9.4f secs\n", t_stop - t_start );
     fclose(erg);
     fclose(traj);
 
