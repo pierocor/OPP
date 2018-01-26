@@ -14,6 +14,10 @@ clean:
 	$(MAKE) $(MFLAGS) -C Obj-serial clean
 	$(MAKE) $(MFLAGS) -C examples clean
 	$(MAKE) $(MFLAGS) -C unit_test/force clean
+	$(MAKE) $(MFLAGS) -C unit_test/kinetic clean
+	$(MAKE) $(MFLAGS) -C unit_test/time_step clean
+	$(MAKE) $(MFLAGS) -C unit_test/input clean
+
 
 check: serial
 	$(MAKE) $(MFLAGS) -C examples check
@@ -23,3 +27,9 @@ check_force:
 
 check_kinetic:
 	$(MAKE) $(MFLAGS) -C unit_test/kinetic check
+
+check_input:
+	$(MAKE) $(MFLAGS) -C unit_test/input check
+
+check_step:
+	$(MAKE) $(MFLAGS) -C unit_test/time_step check

@@ -6,14 +6,14 @@ LDLIBS=-lm
 HOME=../..
 
 # list of source files
-SRC=$(HOME)/src/input.c 
+SRC=$(HOME)/src/input.c
 VPATH=$(HOME)/src
-OBJ=input.o input_param_test.o 
+OBJ=input.o input_param_test.o
 
 default: check
 
 clean:
-	rm -f *.mod *.o input_param_test.x 
+	rm -f *.mod *.o input_param_test.x
 
 # linker rule
 input_param_test.x: $(OBJ)

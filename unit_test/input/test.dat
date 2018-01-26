@@ -1,3 +1,12 @@
-3
-39.948
-Test string
+172		# natoms
+27.043000	# mass in AMU
+0.782300	# epsilon in kcal/mol
+7.251000	# sigma in angstrom
+6.300000	# rcut in angstrom
+16.582000	# box length (in angstrom)
+rest_test.rest	# restart
+traj_test.xyz	# trajectory
+erg_test.dat	# energies
+59281		# nr MD steps
+5.000000	# MD time step (in fs)
+200		# output print frequency
