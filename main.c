@@ -62,6 +62,28 @@ int main(int argc, char **argv)
     sys.fy=(double *)malloc(sys.natoms*sizeof(double));
     sys.fz=(double *)malloc(sys.natoms*sizeof(double));
 
+    /* define here the number of cells per dimension, using the integer division
+    each cell must have side larger than RCUT*/
+    sys.lc = sys.box/sys.rcut;  /* AAA */
+    
+    /*once i define the number of cells per dimension, i calculate the side of each cell with the double division*/
+    sys.rc = sys.box/sys.lc;    /* AAA */
+    
+    /*total number of cell is to the power 3*/
+    sys.ncells = sys.lc*sys.lc*sys.lc; /* AAA */
+    printf("System divided in %d cells, of %f lenght.\n",sys.ncells, sys.rc);  /* AAA */
+    
+    /*each cell must be larger than RCUT, so if the total box L is not larger the 3*RCUT, or the total numbe rof cell is < 27, i don't use the cells
+     i.e. the system is too small to benefit */
+    sys.yescell = 1; /*integer flag to distinguish between the two cases*/  /* AAA */
+    if(sys.ncells < 27) sys.yescell = 0; /* AAA */
+    
+    /*allocate the vector lscl which cointains the index of the particles,
+     so that, the value stored in this array indicates the position in the same array of the next particle within the subcell */
+    sys.lscl=(int *)malloc(sys.natoms*sizeof(int)); /* AAA */
+    /*vector of dimension ncells which contains the index of HEAD particle in the array lscl */
+    sys.head=(int *)malloc((sys.ncells+10)*sizeof(int)); /* AAA */
+
     /* read restart */
     fp=fopen(restfile,"r");
     if(fp) {
@@ -83,6 +105,8 @@ int main(int argc, char **argv)
     t_start=cclock();
     /* initialize forces and energies.*/
     sys.nfi=0;
+    /* refold all the positions in the box, i.e. coordinates must always be x,y,z in (0,L)*/
+    if(sys.yescell) Putinthebox(&sys);  /*AAA*/
     force(&sys);
     ekin(&sys);
 
@@ -103,6 +127,8 @@ int main(int argc, char **argv)
 
         /* propagate system and recompute energies */
         velverlet1(&sys);
+       /* refold all the positions in the box, i.e. coordinates must always be x,y,z in (0,L)*/
+       if(sys.yescell) Putinthebox(&sys); /* AAA */
         force(&sys);
         velverlet2(&sys);
 
@@ -127,5 +153,7 @@ int main(int argc, char **argv)
     free(sys.fy);
     free(sys.fz);
 
+    free(sys.lscl); /*AAA*/
+    free(sys.head); /*AAA*/
     return 0;
 }
