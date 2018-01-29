@@ -1,7 +1,8 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
-CC=gcc
+CC=gcc 
 CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include
+#CFLAGS=-Wall -g -no-pie -O3 -ffast-math -std=c11 -I ../include
 LDLIBS=-lm
 
 # list of source files

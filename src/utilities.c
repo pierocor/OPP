@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <velocity_verlet.h>
+#include <sys/time.h>
 /* helper function: zero out an array */
 void azzero(double *d, const int n)
 {

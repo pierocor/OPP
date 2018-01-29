@@ -9,14 +9,16 @@
 
 
 /* compute forces */
+
 void force(mdsys_t *sys)
 {
-    double r,ffac;
+    double ffac,r2,r6,r12,sigma2;
     double rx,ry,rz;
-    int i,j;
+    // int i,j;
 
     /* zero energy and forces */
     sys->epot=0.0;
+    sigma2=sys->sigma*sys->sigma;  /* <-DEFINED NEW HERE OUTSIDE LOOP */
 #ifdef MPI
     /* BROADCAST OF POSITION AND VELOCITY VECTORS*/
     MPI_Bcast( sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -32,32 +34,33 @@ void force(mdsys_t *sys)
     azzero(sys->fz,sys->natoms);
     for(i=0; i < (sys->natoms); ++i) {
 #endif
-      for(j=0; j < (sys->natoms); ++j) {
+      for(int j=i+1; j < (sys->natoms); ++j) {
 
-        /* particles have no interactions with themselves */
         if (i==j) continue;
 
         /* get distance between particle i and j */
         rx=pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
         ry=pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
         rz=pbc(sys->rz[i] - sys->rz[j], 0.5*sys->box);
-        r = sqrt(rx*rx + ry*ry + rz*rz);
+        r2 = rx*rx + ry*ry + rz*rz;    /* <-DEFINED R2 HERE TO DELETE SQRT instead of r = sqrt(rx*rx + ry*ry + rz*rz)*/
 
-        /* compute force and energy if within cutoff */
-        if (r < sys->rcut) {
-          ffac = -4.0*sys->epsilon*(-12.0*pow(sys->sigma/r,12.0)/r
-                                   +6*pow(sys->sigma/r,6.0)/r);
+        if (r2 < sys->rcut*sys->rcut ) {   /* changed if (r < sys->rcut) */
 
-          sys->epot += 0.5*4.0*sys->epsilon*(pow(sys->sigma/r,12.0)
-                                         -pow(sys->sigma/r,6.0));
+          r2 = (sigma2)/r2;  /* <-REDEFINED R2 HERE */
+          r6 = r2*r2*r2; /* <-DEFINED R6 HERE */
+          r12 = r6*r6; /* <-DEFINED R12 HERE */
+
+          ffac = -4.0*sys->epsilon*(-12.0*r12+6*r6)*r2/sigma2; /*<-REDEFINED ffac,NO MORE pow*/
+
+          sys->epot += 4.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
 #ifdef MPI
-          sys->cx[i] += rx/r*ffac;
-          sys->cy[i] += ry/r*ffac;
-          sys->cz[i] += rz/r*ffac;
+          sys->cx[i] += rx*ffac; sys->cx[j] -= rx*ffac;
+          sys->cy[i] += ry*ffac; sys->cy[j] -= ry*ffac;
+          sys->cz[i] += rz*ffac; sys->cz[j] -= rz*ffac;
 #else
-          sys->fx[i] += rx/r*ffac;
-          sys->fy[i] += ry/r*ffac;
-          sys->fz[i] += rz/r*ffac;
+          sys->fx[i] += rx*ffac; sys->fx[j] -= rx*ffac;
+          sys->fy[i] += ry*ffac; sys->fy[j] -= ry*ffac;
+          sys->fz[i] += rz*ffac; sys->fz[j] -= rz*ffac;
 #endif
         }
       }

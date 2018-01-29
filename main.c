@@ -177,7 +177,9 @@ if (  sys.rank == 0 ){
 #endif
     t_stop=cclock();
     /* clean up: close files, free memory */
-    printf("Simulation Done. Elapsed time: %9.4f secs\n", t_stop - t_start );
+
+    printf("Simulation Done. Elapsed time: %9.6f secs\n", t_stop - t_start );
+
     fclose(erg);
     fclose(traj);
 
