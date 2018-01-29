@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <data.h>
+#include <sys/types.h>
+#include <sys/time.h>
 #include <velocity_verlet.h>
 #include <sys/time.h>
 /* helper function: zero out an array */

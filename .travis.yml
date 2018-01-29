@@ -8,4 +8,8 @@ compiler:
   - gcc
 
 script:
+  - make check_force
+  - make check_kinetic
+  - make check_input
+  - make check_step
   - make check
