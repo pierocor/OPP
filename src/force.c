@@ -22,16 +22,9 @@ void force(mdsys_t *sys)
     MPI_Bcast( sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast( sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast( sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-    if ( sys->rank == 0 ){
-      azzero(sys->fx, sys->natoms);
-      azzero(sys->fy, sys->natoms);
-      azzero(sys->fz, sys->natoms);
-    }else{
-      azzero(sys->fx, sys->my_range);
-      azzero(sys->fy, sys->my_range);
-      azzero(sys->fz, sys->my_range);
-    }
+    azzero(sys->cx,sys->natoms);
+    azzero(sys->cy,sys->natoms);
+    azzero(sys->cz,sys->natoms);
     for(i = sys->my_start; i < sys->my_end; ++i ) {
 #else
     azzero(sys->fx,sys->natoms);
@@ -58,9 +51,9 @@ void force(mdsys_t *sys)
           sys->epot += 0.5*4.0*sys->epsilon*(pow(sys->sigma/r,12.0)
                                          -pow(sys->sigma/r,6.0));
 #ifdef MPI
-          sys->fx[i - sys->my_start] += rx/r*ffac;
-          sys->fy[i - sys->my_start] += ry/r*ffac;
-          sys->fz[i - sys->my_start] += rz/r*ffac;
+          sys->cx[i] += rx/r*ffac;
+          sys->cy[i] += ry/r*ffac;
+          sys->cz[i] += rz/r*ffac;
 #else
           sys->fx[i] += rx/r*ffac;
           sys->fy[i] += ry/r*ffac;
@@ -70,34 +63,11 @@ void force(mdsys_t *sys)
       }
     }
 #ifdef MPI
-    // if( sys->rank != 0 ){
-    //   MPI_Send(sys->fx, sys->my_range, MPI_DOUBLE, 0, TAG, MPI_COMM_WORLD);
-    //   MPI_Send(sys->fy, sys->my_range, MPI_DOUBLE, 0, TAG+1, MPI_COMM_WORLD);
-    //   MPI_Send(sys->fz, sys->my_range, MPI_DOUBLE, 0, TAG+2, MPI_COMM_WORLD);
-    // }else{
-    //   int section_size = sys->my_range;
-    //   int position = 0;
-    //   for ( int sender = 1; sender <  sys->size; sender++ ){
-    //     position += section_size;
-    //     if ( sender == sys->natoms %  sys->size )
-    //       section_size--;
-    //     MPI_Recv( &(sys->fx[ position ]), section_size, MPI_DOUBLE, sender, TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    //     MPI_Recv( &(sys->fy[ position ]), section_size, MPI_DOUBLE, sender, TAG+1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    //     MPI_Recv( &(sys->fz[ position ]), section_size, MPI_DOUBLE, sender, TAG+2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    //   }
-    // }
-    ////////////////////////
-    if( sys->rank != 0 ){
-      MPI_Gatherv( sys->fx, sys->my_range, MPI_DOUBLE, sys->fx, NULL, NULL, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-      MPI_Gatherv( sys->fy, sys->my_range, MPI_DOUBLE, sys->fy, NULL, NULL, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-      MPI_Gatherv( sys->fz, sys->my_range, MPI_DOUBLE, sys->fz, NULL, NULL, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    }else{
-      MPI_Gatherv( sys->fx, sys->my_range, MPI_DOUBLE, sys->fx, sys->ranges, sys->disp, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-      MPI_Gatherv( sys->fy, sys->my_range, MPI_DOUBLE, sys->fy, sys->ranges, sys->disp, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-      MPI_Gatherv( sys->fz, sys->my_range, MPI_DOUBLE, sys->fz, sys->ranges, sys->disp, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    }
 
-    double tmp = (sys->epot);
+    MPI_Reduce( sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( sys->cy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce( sys->cz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    double tmp = sys->epot;
     MPI_Reduce ( &tmp, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 #endif
 }

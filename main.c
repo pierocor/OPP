@@ -68,7 +68,6 @@ if (  sys.rank == 0 ){
 }
 /* BROADCAST PARAMETER */
 MPI_Bcast( &sys.natoms, 1, MPI_INT, 0, MPI_COMM_WORLD);
-MPI_Bcast( &sys.nfi, 1, MPI_INT, 0, MPI_COMM_WORLD);
 MPI_Bcast( &sys.nsteps, 1, MPI_INT, 0, MPI_COMM_WORLD);
 MPI_Bcast( &sys.dt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 MPI_Bcast( &sys.mass, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -76,64 +75,40 @@ MPI_Bcast( &sys.epsilon, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 MPI_Bcast( &sys.sigma, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 MPI_Bcast( &sys.box, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 MPI_Bcast( &sys.rcut, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-
+/* BROADCAST PARAMETER */
 /* COMPUTING RANGES */
-// the standard range of a section is N/ sys.size
-// if N is not a multiple of  sys.size the first processes will have an extra atom
-sys.my_range = sys.natoms /  sys.size;
-if( sys.rank < (sys.natoms %  sys.size) )
-  sys.my_range++;
 sys.my_start = sys.rank * (sys.natoms / sys.size);
 if ( sys.rank < (sys.natoms % sys.size) )
   sys.my_start += sys.rank;
 else
   sys.my_start += (sys.natoms % sys.size);
-sys.my_end = sys.my_start + sys.my_range;
+sys.my_end = sys.my_start + sys.natoms /  sys.size;
+if ( sys.rank < (sys.natoms % sys.size) )
+  sys.my_end++;
+/* COMPUTING RANGES */
 #endif
 
     /* allocate memory */
     sys.rx=(double *)malloc(sys.natoms*sizeof(double));
     sys.ry=(double *)malloc(sys.natoms*sizeof(double));
     sys.rz=(double *)malloc(sys.natoms*sizeof(double));
+
 #ifdef MPI
-if (  sys.rank == 0 ){
-  sys.vx=(double *)malloc(sys.natoms*sizeof(double));
-  sys.vy=(double *)malloc(sys.natoms*sizeof(double));
-  sys.vz=(double *)malloc(sys.natoms*sizeof(double));
-  sys.fx=(double *)malloc(sys.natoms*sizeof(double));
-  sys.fy=(double *)malloc(sys.natoms*sizeof(double));
-  sys.fz=(double *)malloc(sys.natoms*sizeof(double));
-}else{
-  sys.fx=(double *)malloc(sys.my_range*sizeof(double));
-  sys.fy=(double *)malloc(sys.my_range*sizeof(double));
-  sys.fz=(double *)malloc(sys.my_range*sizeof(double));
-}
+
+sys.cx=(double *)malloc(sys.natoms*sizeof(double));
+sys.cy=(double *)malloc(sys.natoms*sizeof(double));
+sys.cz=(double *)malloc(sys.natoms*sizeof(double));
 
 if (  sys.rank == 0 ){
+#endif
 
-      sys.ranges = (int*)malloc(sys.size*sizeof(int));
-      sys.disp = (int*)malloc(sys.size*sizeof(int));
-      sys.ranges[0]=sys.my_range;
-      sys.disp[0]=0;
-      printf("ranges\tdisp\n%d\t%d\n", sys.ranges[0], sys.disp[0]);
-      for (i=1; i<sys.size; i++){
-        sys.ranges[ i ] = sys.natoms /  sys.size;
-        if ( i < (sys.natoms % sys.size) )
-          ++sys.ranges[ i ];
-        sys.disp[i] = sys.disp[i-1]+sys.ranges[i];
-        printf("%d\t%d\n", sys.ranges[i], sys.disp[i]);
-      }
-#else
-    sys.vx=(double *)malloc(sys.natoms*sizeof(double));
-    sys.vy=(double *)malloc(sys.natoms*sizeof(double));
-    sys.vz=(double *)malloc(sys.natoms*sizeof(double));
     sys.fx=(double *)malloc(sys.natoms*sizeof(double));
     sys.fy=(double *)malloc(sys.natoms*sizeof(double));
     sys.fz=(double *)malloc(sys.natoms*sizeof(double));
+    sys.vx=(double *)malloc(sys.natoms*sizeof(double));
+    sys.vy=(double *)malloc(sys.natoms*sizeof(double));
+    sys.vz=(double *)malloc(sys.natoms*sizeof(double));
 
-
-#endif
     /* read restart */
     fp=fopen(restfile,"r");
     if(fp) {
@@ -144,9 +119,6 @@ if (  sys.rank == 0 ){
             fscanf(fp,"%lf%lf%lf",sys.vx+i, sys.vy+i, sys.vz+i);
         }
         fclose(fp);
-        azzero(sys.fx, sys.natoms);
-        azzero(sys.fy, sys.natoms);
-        azzero(sys.fz, sys.natoms);
     } else {
         perror("cannot read restart file");
         return 3;
@@ -154,10 +126,10 @@ if (  sys.rank == 0 ){
 
     t_start=cclock();
     /* initialize forces and energies.*/
-    sys.nfi=0;
 #ifdef MPI
 }
 #endif
+    sys.nfi=0;
     force(&sys);
 #ifdef MPI
 if (  sys.rank == 0 ){
@@ -209,17 +181,16 @@ if (  sys.rank == 0 ){
     fclose(erg);
     fclose(traj);
 
-    free( sys.disp );
-    free( sys.ranges );
+    free(sys.vx);
+    free(sys.vy);
+    free(sys.vz);
 #ifdef MPI
 }
 #endif
     free(sys.rx);
     free(sys.ry);
     free(sys.rz);
-    free(sys.vx);
-    free(sys.vy);
-    free(sys.vz);
+
     free(sys.fx);
     free(sys.fy);
     free(sys.fz);
