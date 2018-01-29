@@ -111,6 +111,19 @@ if (  sys.rank == 0 ){
 }
 
 if (  sys.rank == 0 ){
+
+      sys.ranges = (int*)malloc(sys.size*sizeof(int));
+      sys.disp = (int*)malloc(sys.size*sizeof(int));
+      sys.ranges[0]=sys.my_range;
+      sys.disp[0]=0;
+      printf("ranges\tdisp\n%d\t%d\n", sys.ranges[0], sys.disp[0]);
+      for (i=1; i<sys.size; i++){
+        sys.ranges[ i ] = sys.natoms /  sys.size;
+        if ( i < (sys.natoms % sys.size) )
+          ++sys.ranges[ i ];
+        sys.disp[i] = sys.disp[i-1]+sys.ranges[i];
+        printf("%d\t%d\n", sys.ranges[i], sys.disp[i]);
+      }
 #else
     sys.vx=(double *)malloc(sys.natoms*sizeof(double));
     sys.vy=(double *)malloc(sys.natoms*sizeof(double));
@@ -118,6 +131,8 @@ if (  sys.rank == 0 ){
     sys.fx=(double *)malloc(sys.natoms*sizeof(double));
     sys.fy=(double *)malloc(sys.natoms*sizeof(double));
     sys.fz=(double *)malloc(sys.natoms*sizeof(double));
+
+
 #endif
     /* read restart */
     fp=fopen(restfile,"r");
@@ -193,6 +208,9 @@ if (  sys.rank == 0 ){
     printf("Simulation Done. Elapsed time: %9.4f secs\n", t_stop - t_start );
     fclose(erg);
     fclose(traj);
+
+    free( sys.disp );
+    free( sys.ranges );
 #ifdef MPI
 }
 #endif
