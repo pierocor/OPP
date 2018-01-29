@@ -77,14 +77,14 @@ MPI_Bcast( &sys.box, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 MPI_Bcast( &sys.rcut, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 /* BROADCAST PARAMETER */
 /* COMPUTING RANGES */
-sys.my_start = sys.rank * (sys.natoms / sys.size);
-if ( sys.rank < (sys.natoms % sys.size) )
-  sys.my_start += sys.rank;
-else
-  sys.my_start += (sys.natoms % sys.size);
-sys.my_end = sys.my_start + sys.natoms /  sys.size;
-if ( sys.rank < (sys.natoms % sys.size) )
-  sys.my_end++;
+// sys.my_start = sys.rank * (sys.natoms / sys.size);
+// if ( sys.rank < (sys.natoms % sys.size) )
+//   sys.my_start += sys.rank;
+// else
+//   sys.my_start += (sys.natoms % sys.size);
+// sys.my_end = sys.my_start + sys.natoms /  sys.size;
+// if ( sys.rank < (sys.natoms % sys.size) )
+//   sys.my_end++;
 /* COMPUTING RANGES */
 #endif
 

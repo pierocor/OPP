@@ -20,6 +20,8 @@ void force(mdsys_t *sys)
     sys->epot=0.0;
     sigma2=sys->sigma*sys->sigma;  /* <-DEFINED NEW HERE OUTSIDE LOOP */
 #ifdef MPI
+    int ii;
+
     /* BROADCAST OF POSITION AND VELOCITY VECTORS*/
     MPI_Bcast( sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast( sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -27,7 +29,10 @@ void force(mdsys_t *sys)
     azzero(sys->cx,sys->natoms);
     azzero(sys->cy,sys->natoms);
     azzero(sys->cz,sys->natoms);
-    for(i = sys->my_start; i < sys->my_end; ++i ) {
+    for(ii = 0; ii < (sys->natoms - 1); ii += sys->size) {   /// HEEEERRRREEEEEE!!!! HERE
+      i = ii + sys->rank;
+      if ( i >= (sys->natoms - 1) )
+        break;
 #else
     azzero(sys->fx,sys->natoms);
     azzero(sys->fy,sys->natoms);
@@ -35,9 +40,6 @@ void force(mdsys_t *sys)
     for(i=0; i < (sys->natoms); ++i) {
 #endif
       for(j=i+1; j < (sys->natoms); ++j) {
-
-        if (i==j) continue;
-
         /* get distance between particle i and j */
         rx=pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
         ry=pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
