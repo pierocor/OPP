@@ -137,7 +137,9 @@ int main(int argc, char **argv)
     /**************************************************/
     t_stop=cclock();
     /* clean up: close files, free memory */
+
     printf("Simulation Done. Elapsed time: %9.6f secs\n", t_stop - t_start );
+
     fclose(erg);
     fclose(traj);
 
