@@ -23,7 +23,7 @@ clean:
 	$(MAKE) $(MFLAGS) -C unit_test/input clean
 
 
-check: mpi
+check: mpi default
 	$(MAKE) $(MFLAGS) -C examples check
 
 check_force:

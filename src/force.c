@@ -14,7 +14,7 @@ void force(mdsys_t *sys)
 {
     double ffac,r2,r6,r12,sigma2;
     double rx,ry,rz;
-    // int i,j;
+    int i,j;
 
     /* zero energy and forces */
     sys->epot=0.0;
@@ -34,7 +34,7 @@ void force(mdsys_t *sys)
     azzero(sys->fz,sys->natoms);
     for(i=0; i < (sys->natoms); ++i) {
 #endif
-      for(int j=i+1; j < (sys->natoms); ++j) {
+      for(j=i+1; j < (sys->natoms); ++j) {
 
         if (i==j) continue;
 
