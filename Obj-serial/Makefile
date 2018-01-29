@@ -3,7 +3,7 @@ SHELL=/bin/sh
 CC=gcc 
 CFLAGS=-Wall -pg -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include
 #CFLAGS=-Wall -pg -g -no-pie -O3 -ffast-math -std=c11 -I ../include
-LDLIBS=-lm -lrt
+LDLIBS=-lm
 
 # list of source files
 SRC=../src/force.c ../src/input.c ../src/output.c ../src/utilities.c ../src/verlet1.c ../src/verlet2.c
