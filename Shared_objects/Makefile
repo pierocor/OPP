@@ -1,19 +1,22 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
 CC=gcc
-CFLAGS=-shared -fPIC -Wall -O -std=c11 -I ../include
+CFLAGS=-Wall -g -O3 -ffast-math -fPIC -fomit-frame-pointer -std=c11 -I ../include
 LDLIBS=-lm
 
 # list of source files
 SRC=../src/
 VPATH=../src
-OBJ=force.so input.so output.so utilities.so verlet1.so verlet2.so
+OBJ=force.o input.o output.o utilities.o verlet1.o verlet2.o
+
+default: shared
 
 clean:
 	rm -f *.so *.mod *.o
-shared: $(OBJ)
+shared: py_shared.so
 
-%.so: ../src/%.c
-	$(CC) -o $@ $(CFLAGS) $<
+py_shared.so: $(OBJ)
+	$(CC) -shared $(OBJ) -o py_shared.so
 
-#gcc -o hello.so -shared -fPIC hello.c
+%.o: %.c
+	$(CC) -c $(CFLAGS) $<
