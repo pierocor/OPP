@@ -1,9 +1,9 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
 CC=gcc 
-#CFLAGS=-Wall -g -no-pie -O3 -ffast-math -fomit-frame-pointer -fexpensive-optimizations -msse3 -std=c11 -I ../include
-#CFLAGS=-Wall -pg -g -no-pie -O3 -ffast-math -fexpensive-optimizations -msse -std=c11 -I ../include
-CFLAGS=-Wall -pg -g -no-pie -O3 -ffast-math -fexpensive-optimizations -msse -std=c11 -I ../include
+CFLAGS=-Wall -g -no-pie -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include
+#CFLAGS=-Wall -pg -g -no-pie -O3 -ffast-math -fexpensive-optimizations -msse3 -std=c11 -I ../include
+#CFLAGS=-Wall -pg -g -no-pie -O3 -ffast-math -msse3 -std=c11 -I ../include
 LDLIBS=-lm -lrt -no-pie
 
 # list of source files
