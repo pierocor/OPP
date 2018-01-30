@@ -12,7 +12,7 @@ OBJ=verlet1.o force.o input.o output.o utilities.o  verlet2.o
 default: shared
 
 clean:
-	rm -f *.so *.mod *.o
+	rm -f *.so *.mod *.o *.dat *.xyz
 shared: py_shared.so
 
 py_shared.so: $(OBJ)
