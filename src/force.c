@@ -57,7 +57,9 @@ void force(mdsys_t *sys)
     #endif
     for(i=0; i < (sys->natoms); ++i) {
 #endif
-      for(j=i+1; j < (sys->natoms); ++j) {
+      for(j=0; j < (sys->natoms); ++j) {
+
+        if ( i == j ) continue;
         /* get distance between particle i and j */
         rx=pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
         ry=pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
@@ -72,60 +74,18 @@ void force(mdsys_t *sys)
 
           ffac = -4.0*sys->epsilon*(-12.0*r12+6*r6)*r2/sigma2; /*<-REDEFINED ffac,NO MORE pow*/
           #ifdef OPENMP
-          epot += 4.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
+          epot += 2.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
           #else
-          sys->epot += 4.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
+          sys->epot += 2.0 *sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
           #endif
 #ifdef MPI
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
           sys->cx[i] += rx*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
-          sys->cx[j] -= rx*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
           sys->cy[i] += ry*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
-          sys->cy[j] -= ry*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
           sys->cz[i] += rz*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
-          sys->cz[j] -= rz*ffac;
 #else
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
           sys->fx[i] += rx*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
-          sys->fx[j] -= rx*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
           sys->fy[i] += ry*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
-          sys->fy[j] -= ry*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
           sys->fz[i] += rz*ffac;
-          #ifdef OPENMP
-          #pragma omp atomic update
-          #endif
-          sys->fz[j] -= rz*ffac;
 #endif
         }
       }
