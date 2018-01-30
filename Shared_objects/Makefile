@@ -7,7 +7,7 @@ LDLIBS=-lm
 # list of source files
 SRC=../src/
 VPATH=../src
-OBJ=force.o input.o output.o utilities.o verlet1.o verlet2.o
+OBJ=verlet1.o force.o input.o output.o utilities.o  verlet2.o
 
 default: shared
 
