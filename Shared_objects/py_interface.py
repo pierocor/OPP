@@ -38,8 +38,13 @@ for line in fh.readlines():
 fh.close()
 
 system = Data()
+<<<<<<< HEAD
 system = Data( natoms = 10, mass = float(x[1]), nsteps = 1000,epsilon = float(x[2]), sigma = float(x[3]),\
  dt = float(x[10]), box = float(x[5]), rcut = float(x[4]), temp = 0.0, ekin=0.0, nfi=0,  rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
+=======
+system = Data( natoms = 10, mass = float(x[1]), nsteps = int(x[9]),epsilon = float(x[2]), sigma = float(x[3]),\
+ dt = float(x[10]), box = float(x[5]), rcut = float(x[4]), rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
+>>>>>>> 754c9bd191e726079dd92c341efd206bfa95cfea
 
 nprint = int(x[11])
 
@@ -62,25 +67,37 @@ for i in range(system.natoms):
 fh.close()
 
 erg = open(x[8], "w")
-traj = open(x[7], "w")
+traj = open(x[7], "a")
 
 for i in range(system.natoms):
 	system.fx[i] = 0.0
 	system.fy[i] = 0.0
 	system.fz[i] = 0.0
+testlib.velverlet1(byref(system))
 
 testlib.force(byref(system))
-testlib.ekin(byref(system))
+output(system, erg, traj)
+# testlib.force(byref(system))
+# output(system, erg, traj)
+# testlib.force(byref(system))
+testlib.velverlet1(byref(system))
+# output(system, erg, traj)
+testlib.force(byref(system))
+# output(system, erg, traj)
+# testlib.force(byref(system))
+#testlib.ekin(byref(system))
+
 
 print("Starting simulation with ",system.natoms," atoms for ",system.nsteps," steps." )
 print("     NFI            TEMP            EKIN                 EPOT              ETOT")
 
-#output(system, erg, traj)
-# print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)
+# output(system, erg, traj)
+#
+# testlib.force(byref(system))
 
-for system.nfi in range(1,system.nsteps):
-    if (system.nfi % nprint == 0):
-        print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)
+# for system.nfi in range(1,system.nsteps):
+#     if (system.nfi % nprint == 0):
+#         output(system, erg, traj)
     # testlib.velverlet1(byref(system))
     for i in range(system.natoms):
         system.fx[i] = 0.0
@@ -99,4 +116,7 @@ for i in range(system.natoms):
     print(system.rx[i], system.ry[i], system.rz[i])
     print(system.vx[i], system.vy[i], system.vz[i])
     print(system.fx[i], system.fy[i], system.fz[i])
+
+erg.close()
+traj.close()
 print("Simulation Done")
