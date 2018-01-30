@@ -45,8 +45,8 @@ void force(mdsys_t *sys)
     #endif
     for(ii = 0; ii < (sys->natoms - 1); ii += sys->size) {
       i = ii + sys->rank;
-      if ( i >= (sys->natoms - 1) )
-        break;
+      if ( i  >= (sys->natoms - 1) )
+        continue;
 #else
     azzero(sys->fx,sys->natoms);
     azzero(sys->fy,sys->natoms);

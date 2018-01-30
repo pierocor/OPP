@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
-CC= gcc-7
+CC= gcc
 CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include
 LDLIBS=-lm
 
@@ -18,6 +18,10 @@ mpi: ../ljmd-mpi.x
 omp: CFLAGS = -Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include -DOPENMP -fopenmp
 omp: ../ljmd-omp.x
 
+combo: CFLAGS = -Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include -DMPI -DOPENMP -fopenmp
+combo: CC = mpicc
+combo: ../ljmd-combo.x
+
 clean:
 	rm -f *.mod *.o ../ljmd-mpi.x ../ljmd-omp.x
 
@@ -28,6 +32,9 @@ clean:
 
 
 ../ljmd-omp.x: $(OBJ)
+	$(CC) -o $@ $(CFLAGS) $^ $(LDLIBS)
+
+../ljmd-combo.x: $(OBJ)
 	$(CC) -o $@ $(CFLAGS) $^ $(LDLIBS)
 # compilation pattern rule for objects
 %.o: %.c
