@@ -42,17 +42,17 @@ Profiling serial code with gprof without optimization - 108 particles
 
 ![Profiling serial code with gprof without optimization - 108 particles ](callgraph_ljmd-serial-108_no_opt.png)
 
-Profiling with gprof without optimization - 2916 particles
+Profiling serial code with gprof without optimization - 2916 particles
 
-![Profiling with gprof without optimization - 2916 particles](callgraph_ljmd-serial-2916_no_opt.png)
+![Profiling serial code with gprof without optimization - 2916 particles](callgraph_ljmd-serial-2916_no_opt.png)
 
-Profiling with gprof with the first optimization - 108 particles
+Profiling serial code with gprof with the first optimization - 108 particles
 
-![Profiling with gprof with the first optimization - 108 particles](callgraph_ljmd-serial-108_opt1.png)
+![Profiling serial code with gprof with the first optimization - 108 particles](callgraph_ljmd-serial-108_opt1.png)
 
-Profiling with gprof with the first optimization - 2916 particles
+Profiling serial code with gprof with the first optimization - 2916 particles
 
-![Profiling with gprof with the first optimization - 2916 particles](callgraph_ljmd-serial-2916_opt1.png)
+![Profiling serial code with gprof with the first optimization - 2916 particles](callgraph_ljmd-serial-2916_opt1.png)
 
 
 
@@ -98,11 +98,11 @@ instead of
 
 ```
 
-Profiling with gprof with the second optimization - 108 particles
+Profiling serial code with gprof with the first + the second optimization - 108 particles
 
 ![](callgraph_ljmd-serial-108_opt2.png)
 
-Profiling with gprof with the second optimization - 2916 particles
+Profiling serial code with gprof with the first + the second optimization - 2916 particles
 
 ![](callgraph_ljmd-serial-2916_opt2.png)
 
@@ -170,8 +170,8 @@ head array: contains the index of a particle in the c-th cell. If the cell is em
 lscl array: contains the particle index.
 
 Particles j which belong to cell c, are accessed in this way:
-i) we first find index of the particle in the head  j=head[ c ];
-ii) then we jump from elements in the list lscl as follow
+1. we first find index of the particle in the head  j=head[ c ];
+2. then we jump from elements in the list lscl as follow
 
 ```
 
@@ -196,7 +196,7 @@ This is done simply by dividing each coordinate of the particle i (rx,ry,rz) by 
 
         
 mc[a], a=0,1,2 are the integer coordinate of the cell c.
-The cell index c is then obtained by the formula
+The cell index c is then obtained by the formula:
 
 
 ```
@@ -265,9 +265,9 @@ automatically takes care of periodic boundary condition for the index of the cel
 
 Suppose we have 9 cell in 2 dimension, labeled as follows
 
-6 7 8
-3 4 5
-0 1 2
+|6 7 8
+|3 4 5
+|0 1 2
 
 The left neighbour of cell c=3, is c1=5, so while calculating the pair i<->j, the particles "j", belong to 5, but their coordinates in this case need to be shifted by -L.
 
@@ -279,6 +279,10 @@ The left neighbour of cell c=3, is c1=5, so while calculating the pair i<->j, th
         rz=sys->rz[i] - ( sys->rz[j]+rshift[2]);
 
 ```
+
+Profiling serial code with gprof with the first + the second optimization + cell list - 2916 particles
+
+![](callgraph_ljmd-serial-2916_cell_list.png)
 
 
 ![](serial_optimization_linepoints.png)
