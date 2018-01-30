@@ -91,14 +91,17 @@ for system.nfi in range(1,system.nsteps+1):
     testlib.velverlet2(byref(system))
     testlib.ekin(byref(system))
 t1 = time.time()
-#print(system.natoms, system.mass, system.nsteps ,system.epsilon, system.sigma,\
-# system.dt, system.box , system.rcut , system.temp, system.ekin, system.nfi)
+
 
 for i in range(system.natoms):
     print(system.rx[i], system.ry[i], system.rz[i])
     print(system.vx[i], system.vy[i], system.vz[i])
     print(system.fx[i], system.fy[i], system.fz[i])
 print('Time taken:%20.8f sec \n' %(t1-t0))
+
+print(system.natoms, system.mass, system.nsteps ,system.epsilon, system.sigma,\
+ system.dt, system.box , system.rcut , system.temp, system.ekin, system.nfi)
+
 erg.close()
 traj.close()
 print("Simulation Done")
