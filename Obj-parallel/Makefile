@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
-CC= gcc
+CC= gcc-7
 CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include
 LDLIBS=-lm
 
@@ -23,7 +23,7 @@ combo: CC = mpicc
 combo: ../ljmd-combo.x
 
 clean:
-	rm -f *.mod *.o ../ljmd-mpi.x ../ljmd-omp.x
+	rm -f *.mod *.o ../ljmd-mpi.x ../ljmd-omp.x ../ljmd-combo.x
 
 # linker rule
 
