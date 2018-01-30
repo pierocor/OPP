@@ -13,3 +13,4 @@ script:
   - make check_input
   - make check_step
   - make check
+  - make check_omp
