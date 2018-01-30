@@ -4,8 +4,8 @@ from ctypes import *
 testlib = CDLL('./py_shared.so')
 natoms = 108
 class Data(Structure):
-    _fields_ = [("natoms",c_int),("nfi", c_int),("nsteps", c_int),("epsilon",c_double),
-               ("sigma",c_double),("dt",c_double),("mass",c_double),("box",c_double),("rcut",c_double),
+    _fields_ = [("natoms",c_int),("nfi", c_int),("nsteps", c_int),("dt",c_double),("mass",c_double),("epsilon",c_double),
+               ("sigma",c_double),("box",c_double),("rcut",c_double),
                ("ekin",c_double),("epot",c_double),("temp",c_double),
                ("rx",POINTER(c_double)),("ry",POINTER(c_double)),("rz",POINTER(c_double)),
                ("vx",POINTER(c_double)),("vy",POINTER(c_double)),("vz",POINTER(c_double)),
@@ -38,13 +38,8 @@ for line in fh.readlines():
 fh.close()
 
 system = Data()
-<<<<<<< HEAD
-system = Data( natoms = 10, mass = float(x[1]), nsteps = 1000,epsilon = float(x[2]), sigma = float(x[3]),\
- dt = float(x[10]), box = float(x[5]), rcut = float(x[4]), temp = 0.0, ekin=0.0, nfi=0,  rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
-=======
-system = Data( natoms = 10, mass = float(x[1]), nsteps = int(x[9]),epsilon = float(x[2]), sigma = float(x[3]),\
+system = Data( natoms = int(x[0]), mass = float(x[1]), nsteps = int(x[9]),epsilon = float(x[2]), sigma = float(x[3]),\
  dt = float(x[10]), box = float(x[5]), rcut = float(x[4]), rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
->>>>>>> 754c9bd191e726079dd92c341efd206bfa95cfea
 
 nprint = int(x[11])
 
@@ -73,32 +68,18 @@ for i in range(system.natoms):
 	system.fx[i] = 0.0
 	system.fy[i] = 0.0
 	system.fz[i] = 0.0
-testlib.velverlet1(byref(system))
 
 testlib.force(byref(system))
-output(system, erg, traj)
-# testlib.force(byref(system))
-# output(system, erg, traj)
-# testlib.force(byref(system))
-testlib.velverlet1(byref(system))
-# output(system, erg, traj)
-testlib.force(byref(system))
-# output(system, erg, traj)
-# testlib.force(byref(system))
-#testlib.ekin(byref(system))
+testlib.ekin(byref(system))
 
 
 print("Starting simulation with ",system.natoms," atoms for ",system.nsteps," steps." )
 print("     NFI            TEMP            EKIN                 EPOT              ETOT")
 
-# output(system, erg, traj)
-#
-# testlib.force(byref(system))
 
-# for system.nfi in range(1,system.nsteps):
-#     if (system.nfi % nprint == 0):
-#         output(system, erg, traj)
-    # testlib.velverlet1(byref(system))
+for system.nfi in range(1,system.nsteps):
+    if (system.nfi % nprint == 0):
+        output(system, erg, traj)
     for i in range(system.natoms):
         system.fx[i] = 0.0
         system.fy[i] = 0.0
@@ -107,8 +88,7 @@ print("     NFI            TEMP            EKIN                 EPOT            
     testlib.force(byref(system))
     testlib.velverlet2(byref(system))
     testlib.ekin(byref(system))
-	# testlib.velverlet2(byref(system))
-	# testlib.ekin(byref(system))
+
 print(system.natoms, system.mass, system.nsteps ,system.epsilon, system.sigma,\
  system.dt, system.box , system.rcut , system.temp, system.ekin, system.nfi)
 
