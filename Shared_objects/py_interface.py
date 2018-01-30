@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from ctypes import *
+import time
+
 testlib = CDLL('./py_shared.so')
 natoms = 108
 class Data(Structure):
@@ -76,8 +78,8 @@ testlib.ekin(byref(system))
 print("Starting simulation with ",system.natoms," atoms for ",system.nsteps," steps." )
 print("     NFI            TEMP            EKIN                 EPOT              ETOT")
 
-
-for system.nfi in range(1,system.nsteps):
+t0 = time.time()
+for system.nfi in range(1,system.nsteps+1):
     if (system.nfi % nprint == 0):
         output(system, erg, traj)
     for i in range(system.natoms):
@@ -88,15 +90,15 @@ for system.nfi in range(1,system.nsteps):
     testlib.force(byref(system))
     testlib.velverlet2(byref(system))
     testlib.ekin(byref(system))
-
-print(system.natoms, system.mass, system.nsteps ,system.epsilon, system.sigma,\
- system.dt, system.box , system.rcut , system.temp, system.ekin, system.nfi)
+t1 = time.time()
+#print(system.natoms, system.mass, system.nsteps ,system.epsilon, system.sigma,\
+# system.dt, system.box , system.rcut , system.temp, system.ekin, system.nfi)
 
 for i in range(system.natoms):
     print(system.rx[i], system.ry[i], system.rz[i])
     print(system.vx[i], system.vy[i], system.vz[i])
     print(system.fx[i], system.fy[i], system.fz[i])
-
+print('Time taken:%20.8f sec \n' %(t1-t0))
 erg.close()
 traj.close()
 print("Simulation Done")
