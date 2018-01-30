@@ -1,7 +1,8 @@
-#Optimization 
+Optimization 
+============
 
-
-##First optimization
+First optimization
+------------------
 
 
 In the fist optimization we take advantage of physics, and in particular of Newton's third law.
@@ -37,16 +38,27 @@ This means that the force component of the particle i, f[i], because of the inte
 
 The program was compiled with CFLAGS -Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11.
 
+Profiling serial code with gprof without optimization - 108 particles
 
 ![Profiling serial code with gprof without optimization - 108 particles ](callgraph_ljmd-serial-108_no_opt.png)
+
+Profiling with gprof without optimization - 2916 particles
+
 ![Profiling with gprof without optimization - 2916 particles](callgraph_ljmd-serial-2916_no_opt.png)
+
+Profiling with gprof with the first optimization - 108 particles
+
 ![Profiling with gprof with the first optimization - 108 particles](callgraph_ljmd-serial-108_opt1.png)
+
+Profiling with gprof with the first optimization - 2916 particles
+
 ![Profiling with gprof with the first optimization - 2916 particles](callgraph_ljmd-serial-2916_opt1.png)
 
 
 
 
-##Second optimization
+Second optimization
+-------------------
 
 
 In the second optimization we take advantage of mathematics and in particular we avoid expensive operations such as power and square root.
@@ -71,6 +83,8 @@ instead of
 ```
 -4.0*sys->epsilon*(-12.0*pow(sys->sigma/r,12.0)/r+6*pow(sys->sigma/r,6.0)/r)) 
 
+```
+
 and epot 
 
 ```
@@ -83,19 +97,27 @@ instead of
 0.5*4.0*sys->epsilon*(pow(sys->sigma/r,12.0 -pow(sys->sigma/r,6.0)).
 
 ```
-Profiling with gprof showed a decrease in the 
 
-![Profiling with gprof with the second optimization - 108 particles](callgraph_ljmd-serial-108_opt2.png)
-![Profiling with gprof with the second optimization - 2916 particles](callgraph_ljmd-serial-2916_opt2.png)
+Profiling with gprof with the second optimization - 108 particles
+
+![](callgraph_ljmd-serial-108_opt2.png)
+
+Profiling with gprof with the second optimization - 2916 particles
+
+![](callgraph_ljmd-serial-2916_opt2.png)
 
 
 
 
-##Implement cell list for better scaling with system size
+Implement cell list for better scaling with system size
+--------------------------------------------------------
 
-In order to implement the cell list we divided the simulation box into small cells of equal size. So that each particle in a cell interacts only with the other particles in the same cell and its 26 neighbor cells. The particles belonging to a cell are defined using linked lists. This allows us to achieve am O(N) scaling instead of an O(N square) scaling.
+In order to implement the cell list we divided the simulation box into small cells of equal size.
+So that each particle in a cell interacts only with the other particles in the same cell and its 26 neighbor cells. 
+The particles belonging to a cell are defined using linked lists. 
+This allows us to achieve am O(N) scaling instead of an O(N square) scaling.
 
-###Cells
+### Cells ###
 
 The main idea here is to divide the box in cells, so that the distance i<->j is checked only if i and j belong to neighbouring cells.
 The edge lengths of each cell should be larger than radius.
@@ -135,7 +157,7 @@ void Putinthebox(mdsys_t *sys) {
 
 ```
 
-###Linked list
+### Linked list ###
 
 
 Suppose we have Ncell cells > 27.
@@ -165,23 +187,28 @@ This data structure only need Ncell + N elements in memory. The implementation i
 using this data structure, at the beginnig of the force function we initialize the head and the list, i.e. we assign the particles to each cell.
 This is done simply by dividing each coordinate of the particle i (rx,ry,rz) by rc, and taking the integer part.
 
+
 ```
         mc[0] = sys->rx[i]/sys->rc;
         mc[1] = sys->ry[i]/sys->rc;
         mc[2] = sys->rz[i]/sys->rc;
 ```
+
         
 mc[a], a=0,1,2 are the integer coordinate of the cell c.
 The cell index c is then obtained by the formula
+
 
 ```
 c = mc[0]*lcyz + mc[1]*sys->lc + mc[2];   (with lcyz=sys->lc*sys->lc )
 
 ```
+
 Once we build these array the force loops begin.
 Now, instead of looping on all particles i, and j, we loop on the cells.
 
 The outer loop is:
+
 
 ```
 for (mc[0]=0; mc[0]<sys->lc; (mc[0])++)
@@ -191,10 +218,12 @@ for (mc[0]=0; mc[0]<sys->lc; (mc[0])++)
 c = mc[0]*lcyz+mc[1]*sys->lc+mc[2];
 
 ```
+
 so that here we consider the "current cell" c.
 
 
 Then the inner loop:
+
 
 ```
                for (mc1[0]=mc[0]-1; mc1[0]<=mc[0]+1; (mc1[0])++)
@@ -213,7 +242,8 @@ Suppose now that we are considering cell "c" and "c1", we need to probe all poss
 This is done by starting from the head [c] and then jumping through elements of lscl, as defined above, until we find the EMPTY (E) elements.
 
 An important limit case arises when the calculated nearest neighbour cell "c1" falls outside the limit of the box, i.e. when mc[a] = 0, for some a=0,1,2, and mc1= mc[a]-1, or when mc[a]=lc, and mc1 = mc[a]+1.
-In this case, we use an additional vector rshift[a], and when the nearest neighbour cell c1, is outside the box, along the direction a, we define rshift to be +L (or -L) as follows
+In this case, we use an additional vector rshift[a], and when the nearest neighbour cell c1, is outside the box, along the direction a, we define rshift to be +L (or -L) as follows.
+
 
 ```
 
@@ -241,6 +271,7 @@ Suppose we have 9 cell in 2 dimension, labeled as follows
 
 The left neighbour of cell c=3, is c1=5, so while calculating the pair i<->j, the particles "j", belong to 5, but their coordinates in this case need to be shifted by -L.
 
+
 ```
 
                 rx=sys->rx[i] - ( sys->rx[j]+rshift[0]);
@@ -250,7 +281,7 @@ The left neighbour of cell c=3, is c1=5, so while calculating the pair i<->j, th
 ```
 
 
-![](serial_optimization_linepoints.pdf)
+![](serial_optimization_linepoints.png)
 
 
 
