@@ -38,7 +38,7 @@ for line in fh.readlines():
 fh.close()
 
 system = Data()
-system = Data( natoms = int(x[0]), mass = float(x[1]), nsteps = int(x[9]),epsilon = float(x[2]), sigma = float(x[3]),\
+system = Data( natoms = 10, mass = float(x[1]), nsteps = 1000,epsilon = float(x[2]), sigma = float(x[3]),\
  dt = float(x[10]), box = float(x[5]), rcut = float(x[4]), temp = 0.0, ekin=0.0, nfi=0,  rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
 
 nprint = int(x[11])
@@ -75,7 +75,7 @@ testlib.ekin(byref(system))
 print("Starting simulation with ",system.natoms," atoms for ",system.nsteps," steps." )
 print("     NFI            TEMP            EKIN                 EPOT              ETOT")
 
-output(system, erg, traj)
+#output(system, erg, traj)
 # print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)
 
 for system.nfi in range(1,system.nsteps):
@@ -86,9 +86,17 @@ for system.nfi in range(1,system.nsteps):
         system.fx[i] = 0.0
         system.fy[i] = 0.0
         system.fz[i] = 0.0
+    testlib.velverlet1(byref(system))
     testlib.force(byref(system))
+    testlib.velverlet2(byref(system))
+    testlib.ekin(byref(system))
 	# testlib.velverlet2(byref(system))
 	# testlib.ekin(byref(system))
+print(system.natoms, system.mass, system.nsteps ,system.epsilon, system.sigma,\
+ system.dt, system.box , system.rcut , system.temp, system.ekin, system.nfi)
 
-
+for i in range(system.natoms):
+    print(system.rx[i], system.ry[i], system.rz[i])
+    print(system.vx[i], system.vy[i], system.vz[i])
+    print(system.fx[i], system.fy[i], system.fz[i])
 print("Simulation Done")
