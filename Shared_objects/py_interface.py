@@ -12,6 +12,14 @@ class Data(Structure):
                ("fx",POINTER(c_double)),("fy",POINTER(c_double)),("fz",POINTER(c_double))]
 
 
+
+def output( system, erg, traj):
+    print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)
+    erg.write("% 8d % 20.8f % 20.8f % 20.8f % 20.8f\n" % (system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot))
+    traj.write("%d\n nfi=%d etot=%20.8f\n" % (system.natoms, system.nfi, system.ekin+system.epot))
+    for i in range(system.natoms):
+        traj.write("Ar  %20.8f %20.8f %20.8f\n" % (system.rx[i], system.ry[i], system.rz[i]))
+
 rx=(c_double * natoms)()
 ry=(c_double * natoms)()
 rz=(c_double * natoms)()
@@ -29,88 +37,58 @@ for line in fh.readlines():
     x.append( line.split()[0] )
 fh.close()
 
-
 system = Data()
 system = Data( natoms = int(x[0]), mass = float(x[1]), nsteps = int(x[9]),epsilon = float(x[2]), sigma = float(x[3]),\
- dt = float(x[10]), box = float(x[5]), rcut = float(x[4]), temp = 8.0, ekin=3.0, nfi=1,  rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
+ dt = float(x[10]), box = float(x[5]), rcut = float(x[4]), temp = 0.0, ekin=0.0, nfi=0,  rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
 
 nprint = int(x[11])
 
-system.natoms = 3
-system.nsteps = 10
-
-print(system.natoms)
-
 fh = open( "../examples/argon_108.rest" );
 
-x1 = []
-y1 = []
-z1 = []
-for line in fh.readlines():
-	y = [value for value in line.split()]
-	x1.append(float(y[0]))
-	y1.append(float(y[1]))
-	z1.append(float(y[2]))
+
+for i in range(system.natoms):
+    line=fh.readline()
+    y = line.split()
+    system.rx[i]=float(y[0])
+    system.ry[i]=float(y[1])
+    system.rz[i]=float(y[2])
+
+for i in range(system.natoms):
+    line=fh.readline()
+    y = line.split()
+    system.vx[i]=float(y[0])
+    system.vy[i]=float(y[1])
+    system.vz[i]=float(y[2])
 fh.close()
 
-
-for i in range(system.natoms):
-	system.rx[i] = x1[i]
-	system.ry[i] = y1[i]
-	system.rz[i] = z1[i]
-	system.vx[i] = 0.0 
-	system.vy[i] = 0.0 
-	system.vz[i] = 0.0
-	system.fx[i] = 0.0
-	system.fy[i] = 0.0 
-	system.fz[i] = 0.0
-	print (system.rx[i], system.ry[i], system.rz[i])
-
-#system = Data( natoms = 10, nsteps = 10,epsilon = 0.2379, sigma = 3.405, dt = 5.0,\
-# box = 17.158, rcut = 8.5, temp = 8.0, ekin=3.0, nfi=1, rx=rx, ry=ry, rz=rz, vx=vx, vy=vy, vz=vz, fx=fx, fy=fy, fz=fz)
-
-#testlib.azzero(system.fx,system.natoms)
-#testlib.azzero(system.fy,system.natoms)
-#testlib.azzero(system.fz,system.natoms)
-
-
-system.nfi=0
+erg = open(x[8], "w")
+traj = open(x[7], "w")
 
 for i in range(system.natoms):
 	system.fx[i] = 0.0
-	system.fy[i] = 0.0 
+	system.fy[i] = 0.0
 	system.fz[i] = 0.0
 
 testlib.force(byref(system))
 testlib.ekin(byref(system))
 
+print("Starting simulation with ",system.natoms," atoms for ",system.nsteps," steps." )
+print("     NFI            TEMP            EKIN                 EPOT              ETOT")
 
-#erg = open("output.erg","w")
-#traj = open("output.traj","w")
+output(system, erg, traj)
+# print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)
 
-for system.nfi in range(system.nsteps):
-#	if (system.nfi+1) % nprint == 0:
-#		print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)	
-#		print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)
-#		print(system.natoms, system.nfi,  system.ekin+system.epot)
-#	print(2)
-#	print(2)
-	testlib.velverlet1(byref(system))
-	for i in range(system.natoms):
-		system.fx[i] = 0.0
-		system.fy[i] = 0.0 
-		system.fz[i] = 0.0	
-	testlib.force(byref(system))
-	testlib.velverlet2(byref(system))
-	testlib.ekin(byref(system))
+for system.nfi in range(1,system.nsteps):
+    if (system.nfi % nprint == 0):
+        print(system.nfi, system.temp, system.ekin, system.epot, system.ekin+system.epot)
+    # testlib.velverlet1(byref(system))
+    for i in range(system.natoms):
+        system.fx[i] = 0.0
+        system.fy[i] = 0.0
+        system.fz[i] = 0.0
+    testlib.force(byref(system))
+	# testlib.velverlet2(byref(system))
+	# testlib.ekin(byref(system))
 
-for i in range(system.natoms):
-	print (system.rx[i], system.ry[i], system.rz[i])
 
-print(3)
-
-print("Simulation Done")	
-#erg.close()
-#traj.close()
-
-print(4)
+print("Simulation Done")
