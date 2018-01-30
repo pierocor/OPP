@@ -5,13 +5,17 @@ SHELL=/bin/sh
 OBJ_SERIAL=$(SRC:src/%.f90=Obj-serial/%.o)
 ############################################
 
-default: serial
+default: mpi
 
 serial:
 	$(MAKE) $(MFLAGS) -C Obj-$@
 
+mpi:
+	$(MAKE) $(MFLAGS) -C Obj-$@
+
 clean:
 	$(MAKE) $(MFLAGS) -C Obj-serial clean
+	$(MAKE) $(MFLAGS) -C Obj-mpi clean
 	$(MAKE) $(MFLAGS) -C examples clean
 	$(MAKE) $(MFLAGS) -C unit_test/force clean
 	$(MAKE) $(MFLAGS) -C unit_test/kinetic clean
@@ -19,7 +23,7 @@ clean:
 	$(MAKE) $(MFLAGS) -C unit_test/input clean
 
 
-check: serial
+check: mpi serial
 	$(MAKE) $(MFLAGS) -C examples check
 
 check_force:

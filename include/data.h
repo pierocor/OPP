@@ -19,6 +19,11 @@ struct _mdsys {
     double *rx, *ry, *rz;
     double *vx, *vy, *vz;
     double *fx, *fy, *fz;
+    double *cx, *cy, *cz;
+#ifdef MPI
+    int rank, size; /* my_range, my_start, my_end ;
+    int * ranges, * disp;*/
+#endif
 };
 typedef struct _mdsys mdsys_t;
 
