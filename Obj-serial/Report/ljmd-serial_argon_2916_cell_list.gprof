@@ -3,11 +3,11 @@ Flat profile:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
  time   seconds   seconds    calls  Ts/call  Ts/call  name    
- 99.73     14.62    14.62                             force
-  0.20     14.65     0.03                             velverlet1
-  0.14     14.67     0.02                             velverlet2
-  0.07     14.68     0.01                             ekin
-  0.00     14.68     0.00     3003     0.00     0.00  azzero
+ 99.43     14.04    14.04                             force
+  0.35     14.09     0.05                             velverlet2
+  0.28     14.13     0.04                             velverlet1
+  0.07     14.14     0.01                             ekin
+  0.00     14.14     0.00     3003     0.00     0.00  azzero
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -45,18 +45,18 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 2 byte(s) for 0.07% of 14.68 seconds
+granularity: each sample hit covers 2 byte(s) for 0.07% of 14.14 seconds
 
 index % time    self  children    called     name
                                                  <spontaneous>
-[1]     99.6   14.62    0.00                 force [1]
+[1]     99.3   14.04    0.00                 force [1]
                 0.00    0.00    3003/3003        azzero [5]
 -----------------------------------------------
                                                  <spontaneous>
-[2]      0.2    0.03    0.00                 velverlet1 [2]
+[2]      0.4    0.05    0.00                 velverlet2 [2]
 -----------------------------------------------
                                                  <spontaneous>
-[3]      0.1    0.02    0.00                 velverlet2 [3]
+[3]      0.3    0.04    0.00                 velverlet1 [3]
 -----------------------------------------------
                                                  <spontaneous>
 [4]      0.1    0.01    0.00                 ekin [4]
@@ -155,5 +155,5 @@ notice and this notice are preserved.
 
 Index by function name
 
-   [5] azzero                  [1] force                   [3] velverlet2
-   [4] ekin                    [2] velverlet1
+   [5] azzero                  [1] force                   [2] velverlet2
+   [4] ekin                    [3] velverlet1

@@ -3,11 +3,12 @@ Flat profile:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
  time   seconds   seconds    calls  us/call  us/call  name    
- 76.75      0.82     0.82                             force
- 17.78      1.01     0.19 173357334     0.00     0.00  pbc
-  2.81      1.04     0.03    30003     1.00     1.00  azzero
-  1.87      1.06     0.02                             velverlet1
-  0.94      1.07     0.01                             ekin
+ 70.93      0.68     0.68                             force
+ 19.82      0.87     0.19 173357334     0.00     0.00  pbc
+  4.17      0.91     0.04    30003     1.34     1.34  azzero
+  3.13      0.94     0.03                             velverlet2
+  1.04      0.95     0.01                             ekin
+  1.04      0.96     0.01                             velverlet1
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -45,25 +46,28 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 2 byte(s) for 0.93% of 1.07 seconds
+granularity: each sample hit covers 2 byte(s) for 1.04% of 0.96 seconds
 
 index % time    self  children    called     name
                                                  <spontaneous>
-[1]     97.2    0.82    0.22                 force [1]
+[1]     94.8    0.68    0.23                 force [1]
                 0.19    0.00 173357334/173357334     pbc [2]
-                0.03    0.00   30003/30003       azzero [3]
+                0.04    0.00   30003/30003       azzero [3]
 -----------------------------------------------
                 0.19    0.00 173357334/173357334     force [1]
-[2]     17.8    0.19    0.00 173357334         pbc [2]
+[2]     19.8    0.19    0.00 173357334         pbc [2]
 -----------------------------------------------
-                0.03    0.00   30003/30003       force [1]
-[3]      2.8    0.03    0.00   30003         azzero [3]
------------------------------------------------
-                                                 <spontaneous>
-[4]      1.9    0.02    0.00                 velverlet1 [4]
+                0.04    0.00   30003/30003       force [1]
+[3]      4.2    0.04    0.00   30003         azzero [3]
 -----------------------------------------------
                                                  <spontaneous>
-[5]      0.9    0.01    0.00                 ekin [5]
+[4]      3.1    0.03    0.00                 velverlet2 [4]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]      1.0    0.01    0.00                 ekin [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      1.0    0.01    0.00                 velverlet1 [6]
 -----------------------------------------------
 
  This table describes the call tree of the program, and was sorted by
@@ -156,5 +160,5 @@ notice and this notice are preserved.
 
 Index by function name
 
-   [3] azzero                  [1] force                   [4] velverlet1
-   [5] ekin                    [2] pbc
+   [3] azzero                  [1] force                   [6] velverlet1
+   [5] ekin                    [2] pbc                     [4] velverlet2
