@@ -30,9 +30,15 @@ __global__ void focres(double * d_rx,double *d_ry,double * d_rz, double * d_vx,d
 
         // if (i==j) continue;
         if (idx > idy){
-            while ((d_rx[idx] - d_rx[idy]) >  0.5*box) rx -= box; while ((d_rx[idx] - d_rx[idy]) <  0.5*box) rx += box;
-            while ((d_ry[idx] - d_ry[idy]) >  0.5*box) ry -= box; while ((d_ry[idx] - d_ry[idy]) <  0.5*box) ry += box;
-            while ((d_rz[idx] - d_rz[idy]) >  0.5*box) rz -= box; while ((d_rz[idx] - d_rz[idy]) <  0.5*box) rz += box;
+            while ((d_rx[idx] - d_rx[idy]) >  0.5*box) (d_rx[idx] - d_rx[idy]) -= box;
+            while ((d_rx[idx] - d_rx[idy]) <  0.5*box) (d_rx[idx] - d_rx[idy]) += box;
+            rx = (d_rx[idx] - d_rx[idy])
+            while ((d_ry[idx] - d_ry[idy]) >  0.5*box) (d_ry[idx] - d_ry[idy]) -= box;
+            while ((d_ry[idx] - d_ry[idy]) <  0.5*box) (d_ry[idx] - d_ry[idy]) += box;
+            ry = (d_ry[idx] - d_ry[idy])
+            while ((d_rz[idx] - d_rz[idy]) >  0.5*box) (d_rz[idx] - d_rz[idy]) -= box;
+            while ((d_rz[idx] - d_rz[idy]) <  0.5*box) (d_rz[idx] - d_rz[idy]) += box;
+            rz = (d_rz[idx] - d_rz[idy])
 
             r2 = rx*rx + ry*ry + rz*rz;
 
