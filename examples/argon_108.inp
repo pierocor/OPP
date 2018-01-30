@@ -1,8 +1,8 @@
 108               # natoms
 39.948            # mass in AMU
-0.2379            # epsilon in kcal/mol
-3.405             # sigma in angstrom
-0.1
+0.2379           # epsilon in kcal/mol
+3.9             # sigma in angstrom
+1.4
 8.5               # rcut in angstrom
 17.1580           # box length (in angstrom)
 argon_108.rest    # restart

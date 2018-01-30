@@ -22,6 +22,8 @@ void force(mdsys_t *sys)   /*AAA*/
     D = sys->epsilon;
     aa= sys->aa;
     re = sys->sigma;
+
+
    
     /* zero energy and forces */
     sys->epot=0.0;
@@ -118,8 +120,8 @@ void force(mdsys_t *sys)   /*AAA*/
                                             temp2 = 1.0 - temp1 ;
                                             
                                             
-                                            sys->epot += D * temp2 * temp2 ;
-                                            ffac = 2.0 * D * temp2 * aa * temp1;
+                                            sys->epot += D * (temp2 * temp2 -1.0) ;
+                                            ffac = -2.0 * D * temp2 * aa * temp1;
                                             
                                             
                                             sys->fx[i] += rx*ffac; sys->fx[j] -= rx*ffac;
@@ -163,8 +165,8 @@ void force(mdsys_t *sys)   /*AAA*/
                       temp2 = 1.0 - temp1 ;
                                             
                                             
-                        sys->epot += D * temp2 * temp2 ;
-                        ffac = 2.0 * D * temp2 * aa * temp1;
+                        sys->epot += D * (temp2 * temp2 -1.0) ;
+                        ffac = -2.0 * D * temp2 * aa * temp1;
                     
               
                     
