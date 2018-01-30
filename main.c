@@ -186,17 +186,20 @@ if (  sys.rank == 0 ){
     free(sys.vx);
     free(sys.vy);
     free(sys.vz);
+    free(sys.fx);
+    free(sys.fy);
+    free(sys.fz);
 #ifdef MPI
 }
 #endif
     free(sys.rx);
     free(sys.ry);
     free(sys.rz);
-
-    free(sys.fx);
-    free(sys.fy);
-    free(sys.fz);
 #ifdef MPI
+    free(sys.cx);
+    free(sys.cy);
+    free(sys.cz);
+
 MPI_Finalize();
 #endif
     return 0;
