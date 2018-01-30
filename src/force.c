@@ -41,7 +41,7 @@ void force(mdsys_t *sys)
     azzero(sys->cz,sys->natoms);
     #ifdef OPENMP
     double epot = 0.0;
-    #pragma omp parallel for default(shared) private(ii, i, ffac, r2, r6, r12, rx, ry, rz, j) reduction(+:epot)
+    #pragma omp parallel for default(shared) schedule(guided) private(ii, i, ffac, r2, r6, r12, rx, ry, rz, j) reduction(+:epot)
     #endif
     for(ii = 0; ii < (sys->natoms - 1); ii += sys->size) {
       i = ii + sys->rank;
@@ -53,7 +53,7 @@ void force(mdsys_t *sys)
     azzero(sys->fz,sys->natoms);
     #ifdef OPENMP
     double epot = 0.0;
-    #pragma omp parallel for default(shared) private(i, ffac, r2, r6, r12, rx, ry, rz, j) reduction(+:epot)
+    #pragma omp parallel for default(shared) schedule(guided) private(i, ffac, r2, r6, r12, rx, ry, rz, j) reduction(+:epot)
     #endif
     for(i=0; i < (sys->natoms); ++i) {
 #endif
@@ -77,9 +77,30 @@ void force(mdsys_t *sys)
           sys->epot += 4.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
           #endif
 #ifdef MPI
-          sys->cx[i] += rx*ffac; sys->cx[j] -= rx*ffac;
-          sys->cy[i] += ry*ffac; sys->cy[j] -= ry*ffac;
-          sys->cz[i] += rz*ffac; sys->cz[j] -= rz*ffac;
+          #ifdef OPENMP
+          #pragma omp atomic update
+          #endif
+          sys->cx[i] += rx*ffac;
+          #ifdef OPENMP
+          #pragma omp atomic update
+          #endif
+          sys->cx[j] -= rx*ffac;
+          #ifdef OPENMP
+          #pragma omp atomic update
+          #endif
+          sys->cy[i] += ry*ffac;
+          #ifdef OPENMP
+          #pragma omp atomic update
+          #endif
+          sys->cy[j] -= ry*ffac;
+          #ifdef OPENMP
+          #pragma omp atomic update
+          #endif
+          sys->cz[i] += rz*ffac;
+          #ifdef OPENMP
+          #pragma omp atomic update
+          #endif
+          sys->cz[j] -= rz*ffac;
 #else
           #ifdef OPENMP
           #pragma omp atomic update
