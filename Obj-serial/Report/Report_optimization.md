@@ -264,10 +264,14 @@ c1 = ((mc1[0]+sys->lc)%sys->lc)*lcyz+((mc1[1]+sys->lc)%sys->lc)*sys->lc+((mc1[2]
 automatically takes care of periodic boundary condition for the index of the cell (i.e c1 is always within 0 and ncell, but the postion of the particles need to be shifted by +/-L to calculate the correct periodic image distance.
 
 Suppose we have 9 cell in 2 dimension, labeled as follows
-|-------|
-| 6 7 8 |
-| 3 4 5 |
-| 0 1 2 |
+
+
+```
+ 6 7 8 
+ 3 4 5 
+ 0 1 2 
+
+```
 
 The left neighbour of cell c=3, is c1=5, so while calculating the pair i<->j, the particles "j", belong to 5, but their coordinates in this case need to be shifted by -L.
 
