@@ -19,7 +19,7 @@ static const double mvsq2e=2390.05736153349; /* m*v^2 in kcal/mol */
  * about the MD system */
 struct _mdsys {
     int natoms,nfi,nsteps;
-    double dt, mass, epsilon, sigma, box, rcut;
+    double dt, mass, epsilon, sigma, box, rcut, aa;
     double ekin, epot, temp;
     double *rx, *ry, *rz;
     double *vx, *vy, *vz;

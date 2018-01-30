@@ -38,6 +38,8 @@ int main(int argc, char **argv)
     if(get_a_line(stdin,line)) return 1;
     sys.sigma=atof(line);
     if(get_a_line(stdin,line)) return 1;
+    sys.aa=atof(line);
+    if(get_a_line(stdin,line)) return 1;
     sys.rcut=atof(line);
     if(get_a_line(stdin,line)) return 1;
     sys.box=atof(line);

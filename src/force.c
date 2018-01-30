@@ -13,11 +13,15 @@ static double pbc(double x, const double boxby2)
 /* compute forces */
 void force(mdsys_t *sys)   /*AAA*/
 {
-    double ffac,r2,r6,r12,sigma2;
+    double ffac,r2;
     double rx,ry,rz;
     int i,j,a;
     int lcyz,lcxyz,mc[3],c,mc1[3],c1;
     double rshift[3];
+    double D,aa,re,temp1,temp2;
+    D = sys->epsilon;
+    aa= sys->aa;
+    re = sys->sigma;
    
     /* zero energy and forces */
     sys->epot=0.0;
@@ -25,7 +29,7 @@ void force(mdsys_t *sys)   /*AAA*/
     azzero(sys->fy,sys->natoms);
     azzero(sys->fz,sys->natoms);
     
-    sigma2=sys->sigma*sys->sigma;
+   
     
     
     if(sys->yescell) {
@@ -109,14 +113,13 @@ void force(mdsys_t *sys)   /*AAA*/
                                         r2 = rx*rx+ry*ry+rz*rz;
                                         if (r2 < sys->rcut*sys->rcut) {
                                             
-                                            r2= (sigma2)/r2;
-                                            r6= r2*r2*r2;
-                                            r12= r6*r6;
+                                            r2=sqrt(r2);
+ 					    temp1 = exp(-aa*(r2-re));
+                                            temp2 = 1.0 - temp1 ;
                                             
                                             
-                                            ffac = -4.0*sys->epsilon*(-12.0*r12+6*r6)*r2 /sigma2;
-                                            
-                                            sys->epot += 4.0*sys->epsilon*(r12-r6);
+                                            sys->epot += D * temp2 * temp2 ;
+                                            ffac = 2.0 * D * temp2 * aa * temp1;
                                             
                                             
                                             sys->fx[i] += rx*ffac; sys->fx[j] -= rx*ffac;
@@ -153,15 +156,17 @@ void force(mdsys_t *sys)   /*AAA*/
                 r2 = rx*rx+ry*ry+rz*rz;
                 
                 if (r2 < sys->rcut*sys->rcut) {
+
+
+                     r2=sqrt(r2);
+ 		     temp1 = exp(-aa*(r2-re));
+                      temp2 = 1.0 - temp1 ;
+                                            
+                                            
+                        sys->epot += D * temp2 * temp2 ;
+                        ffac = 2.0 * D * temp2 * aa * temp1;
                     
-                    
-                    r2= (sigma2)/r2;
-                    r6= r2*r2*r2;
-                    r12= r6*r6;
-                
-                    ffac = -4.0*sys->epsilon*(-12.0*r12+6*r6)*r2/sigma2;
-                    
-                    sys->epot += 4.0*sys->epsilon*(r12-r6);
+              
                     
                     sys->fx[i] += rx*ffac; sys->fx[j] -= rx*ffac;
                     sys->fy[i] += ry*ffac; sys->fy[j] -= ry*ffac;
