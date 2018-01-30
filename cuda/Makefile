@@ -6,9 +6,9 @@ CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include
 LDLIBS=-lm
 
 # list of source files
-SRC=../src/force.cu ../src/input.c ../src/output.c ../src/utilities.c ../src/verlet1.c ../src/verlet2.c
+SRC=../src/input.c ../src/output.c ../src/utilities.c ../src/verlet1.c ../src/verlet2.c
 VPATH=../src
-OBJ=forces.o input.o main.o output.o utilities.o verlet1.o verlet2.o
+OBJ=cuda.o input.o cuda_main.o output.o utilities.o verlet1.o verlet2.o
 
 default: ./cuda.x
 
@@ -16,15 +16,15 @@ clean:
 	rm -f *.mod *.o
 
 # linker rule
-cuda.x: $(OBJ) main.o
-	nvcc -c ../src/force.cu forces.o -I ../include/
+cuda.x: $(OBJ) cuda_main.o
+	$(CC) -o $@ $(CFLAGS) $^ $(LDLIBS)
 
 # compilation pattern rule for objects
 %.o: %.c
-	nvcc -c $(CFLAGS) $<
+	$(CC) -c $(CFLAGS) $<
 
-forces.o: ../src/force.cu
-	nvcc -c ../src/force.cu forces.o -I ../include/
+cuda.o: ./cuda.cu
+	nvcc -c ./cuda.cu -I ../include/
 
-main.o: ./cuda_main.cu
-	nvcc -c ../src/force.cu forces.o -I ../include/
+cuda_main.o: ./cuda_main.cu
+	nvcc -c cuda_main.cu -I ../include/
