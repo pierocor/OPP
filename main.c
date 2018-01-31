@@ -82,7 +82,7 @@ int main(int argc, char **argv)
      so that, the value stored in this array indicates the position in the same array of the next particle within the subcell */
     sys.lscl=(int *)malloc(sys.natoms*sizeof(int)); /* AAA */
     /*vector of dimension ncells which contains the index of HEAD particle in the array lscl */
-    sys.head=(int *)malloc((sys.ncells+10)*sizeof(int)); /* AAA */
+    sys.head=(int *)malloc((sys.ncells)*sizeof(int)); /* AAA */
 
     /* read restart */
     fp=fopen(restfile,"r");

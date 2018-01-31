@@ -2,6 +2,13 @@
 #include <data.h>
 #include <velocity_verlet.h>
 
+/* helper function: apply minimum image convention */
+static double pbc(double x, const double boxby2)
+{
+    while (x >  boxby2) x -= 2.0*boxby2;
+    while (x < -boxby2) x += 2.0*boxby2;
+    return x;
+}
 
 /* compute forces */
 void force(mdsys_t *sys)   /*AAA*/
@@ -94,7 +101,7 @@ void force(mdsys_t *sys)   /*AAA*/
                                     
                                     /* Avoid double counting of pairs */
                                     if (i < j) {
-                                        /* here i dont use the periodic image because the subcell take car eof this using the rshift[]
+                                        /* here i dont use the periodic image because the subcell take care of this using the rshift[]
                                          defined above*/
                                         rx=sys->rx[i] - ( sys->rx[j]+rshift[0]);
                                         ry=sys->ry[i] - ( sys->ry[j]+rshift[1]);

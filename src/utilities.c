@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <data.h>
-#include <sys/types.h>
-#include <sys/time.h>
 #include <velocity_verlet.h>
 #include <sys/time.h>
 /* helper function: zero out an array */
@@ -15,13 +13,13 @@ void azzero(double *d, const int n)
     }
 }
 
-/* helper function: apply minimum image convention */
+/* helper function: apply minimum image convention 
 double pbc(double x, const double boxby2)
 {
     while (x >  boxby2) x -= 2.0*boxby2;
     while (x < -boxby2) x += 2.0*boxby2;
     return x;
-}
+}*/
 
 /* compute kinetic energy */
 void ekin(mdsys_t *sys)
