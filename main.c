@@ -112,6 +112,29 @@ if (  sys.rank == 0 ){
     sys.vy=(double *)malloc(sys.natoms*sizeof(double));
     sys.vz=(double *)malloc(sys.natoms*sizeof(double));
 
+#ifdef CL
+    /* define here the number of cells per dimension, using the integer division
+    each cell must have side larger than RCUT*/
+    sys.lc = sys.box/sys.rcut;  /* AAA */
+
+    /*once i define the number of cells per dimension, i calculate the side of each cell with the double division*/
+    sys.rc = sys.box/sys.lc;    /* AAA */
+
+    /*total number of cell is to the power 3*/
+    sys.ncells = sys.lc*sys.lc*sys.lc; /* AAA */
+    printf("System divided in %d cells, of %f lenght.\n",sys.ncells, sys.rc);  /* AAA */
+
+    /*each cell must be larger than RCUT, so if the total box L is not larger the 3*RCUT, or the total numbe rof cell is < 27, i don't use the cells
+     i.e. the system is too small to benefit */
+    sys.yescell = 1; /*integer flag to distinguish between the two cases*/  /* AAA */
+    if(sys.ncells < 27) sys.yescell = 0; /* AAA */
+
+    /*allocate the vector lscl which cointains the index of the particles,
+     so that, the value stored in this array indicates the position in the same array of the next particle within the subcell */
+    sys.lscl=(int *)malloc(sys.natoms*sizeof(int)); /* AAA */
+    /*vector of dimension ncells which contains the index of HEAD particle in the array lscl */
+    sys.head=(int *)malloc((sys.ncells)*sizeof(int)); /* AAA */
+#endif
     /* read restart */
     fp=fopen(restfile,"r");
     if(fp) {
@@ -133,6 +156,10 @@ if (  sys.rank == 0 ){
 }
 #endif
     sys.nfi=0;
+    /* refold all the positions in the box, i.e. coordinates must always be x,y,z in (0,L)*/
+#ifdef CL
+    if(sys.yescell) Putinthebox(&sys);  /*AAA*/
+#endif
     force(&sys);
 #ifdef MPI
 if (  sys.rank == 0 ){
@@ -160,6 +187,10 @@ if (  sys.rank == 0 ){
 
         /* propagate system and recompute energies */
         velverlet1(&sys);
+#ifdef CL
+       /* refold all the positions in the box, i.e. coordinates must always be x,y,z in (0,L)*/
+       if(sys.yescell) Putinthebox(&sys); /* AAA */
+#endif
 #ifdef MPI
 }
 #endif
@@ -198,6 +229,12 @@ if (  sys.rank == 0 ){
     free(sys.rx);
     free(sys.ry);
     free(sys.rz);
+#ifdef CL
+    free(sys.lscl); /*AAA*/
+    free(sys.head); /*AAA*/
+#endif
+
+
 #ifdef MPI
     free(sys.cx);
     free(sys.cy);

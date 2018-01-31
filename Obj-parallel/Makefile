@@ -11,13 +11,16 @@ OBJ=force.o input.o main.o output.o utilities.o verlet1.o verlet2.o
 
 default: mpi
 
+mpi: clean
 mpi: CFLAGS = -Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include -DMPI
 mpi: CC = mpicc
 mpi: ../ljmd-mpi.x
 
+omp: clean
 omp: CFLAGS = -Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include -DOPENMP -fopenmp
 omp: ../ljmd-omp.x
 
+combo: clean
 combo: CFLAGS = -Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include -DMPI -DOPENMP -fopenmp
 combo: CC = mpicc
 combo: ../ljmd-combo.x

@@ -26,8 +26,11 @@ clean:
 	$(MAKE) $(MFLAGS) -C unit_test/input clean
 
 
-check: mpi serial
+check: serial
 	$(MAKE) $(MFLAGS) -C examples check
+
+check_mpi: mpi
+	$(MAKE) $(MFLAGS) -C examples check_mpi
 
 check_omp: omp
 	$(MAKE) $(MFLAGS) -C examples check_omp
