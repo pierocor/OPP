@@ -23,12 +23,18 @@ struct _mdsys {
     double ekin, epot, temp;
     double *rx, *ry, *rz;
     double *vx, *vy, *vz;
-    double *fx, *fy, *fz;   
+    double *fx, *fy, *fz;
+#ifdef CL
     int *lscl, *head;   /*AAA */
     int lc,ncells;   /*AAA */
     double rc;      /*AAA */
     int yescell;    /*AAA*/
-
+#endif
+#ifdef MPI
+    double *cx, *cy, *cz;
+    int rank, size; /* my_range, my_start, my_end ;
+    int * ranges, * disp;*/
+#endif
 };
 typedef struct _mdsys mdsys_t;
 
