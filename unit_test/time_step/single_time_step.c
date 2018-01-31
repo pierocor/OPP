@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     mdsys_t sys;
 
     /* pre-filled sys with selected values */
-    sys.natoms = 10;
+    sys.natoms = 3;
     sys.mass = 39.948;
     sys.epsilon = 0.2379;
     sys.sigma = 3.405;
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     sys.dt  = 5.0;
 
 
-    /* allocate memory */
+   /* allocate memory */
     sys.rx=(double *)malloc(sys.natoms*sizeof(double));
     sys.ry=(double *)malloc(sys.natoms*sizeof(double));
     sys.rz=(double *)malloc(sys.natoms*sizeof(double));
@@ -47,6 +47,28 @@ int main(int argc, char **argv)
     sys.fx=(double *)malloc(sys.natoms*sizeof(double));
     sys.fy=(double *)malloc(sys.natoms*sizeof(double));
     sys.fz=(double *)malloc(sys.natoms*sizeof(double));
+
+    /* define here the number of cells per dimension, using the integer division
+    each cell must have side larger than RCUT*/
+    sys.lc = sys.box/sys.rcut;  /* AAA */
+    
+    /*once i define the number of cells per dimension, i calculate the side of each cell with the double division*/
+    sys.rc = sys.box/sys.lc;    /* AAA */
+    
+    /*total number of cell is to the power 3*/
+    sys.ncells = sys.lc*sys.lc*sys.lc; /* AAA */
+    printf("System divided in %d cells, of %f lenght.\n",sys.ncells, sys.rc);  /* AAA */
+    
+    /*each cell must be larger than RCUT, so if the total box L is not larger the 3*RCUT, or the total numbe rof cell is < 27, i don't use the cells
+     i.e. the system is too small to benefit */
+    sys.yescell = 1; /*integer flag to distinguish between the two cases*/  /* AAA */
+    if(sys.ncells < 27) sys.yescell = 0; /* AAA */
+    
+    /*allocate the vector lscl which cointains the index of the particles,
+     so that, the value stored in this array indicates the position in the same array of the next particle within the subcell */
+    sys.lscl=(int *)malloc(sys.natoms*sizeof(int)); /* AAA */
+    /*vector of dimension ncells which contains the index of HEAD particle in the array lscl */
+    sys.head=(int *)malloc((sys.ncells)*sizeof(int)); /* AAA */
 
     /* read restart */
     fp=fopen("argon_time_step.rest","r");
@@ -82,6 +104,7 @@ int main(int argc, char **argv)
 
       /* propagate system and recompute energies */
       velverlet1(&sys);
+      if(sys.yescell) Putinthebox(&sys);  /*AAA*/
       velverlet2(&sys);
       ekin(&sys);
     }
