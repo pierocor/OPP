@@ -18,9 +18,9 @@ to remove all compiled objects
 
 ### Team
 
-Piero Coronica (pierocor)
-Aurora Maurizio (auroramaurizio)
-Rajat Panda (rjtkp)
+* Piero Coronica (pierocor)
+* Aurora Maurizio (auroramaurizio)
+* Rajat Panda (rjtkp)
 
 
 You will work in this assignment in small groups with 3 or 4 members. The evaluation will be based in part (1/3rd) on the performance of the group as a total and also based on the individual contributions as evidenced by the commits to the project (2/3rd). Please add a list of the group members and how their names will show up in the commit messages to the README file, so that your commits will be properly attributed.
@@ -39,9 +39,12 @@ Add these tests to the existing testing facility with Travis-CI.
 a) Create a python interface so that top-level operations are implemented in python and only time critical steps are performed in C. This can be done incrementally. Minimal goal is to replace input (of parameters) and do unit testing in python.
 
 b) Optimize the force computation: refactor the code for better optimization and to avoid costly operations or redundant work. Adapt data structures as needed. Document improvements with profiling/benchmark data.
+
 c) Add MPI or OpenMP parallelization. Document the parallel efficiency of changes.
+
 d) (for 4-member groups) Add second parallelization method.
 It is crucial that the individual tasks are implemented in small self-contained steps, so that they can be merged into the master branch frequently. Do not wait until it is too late.
+
 ### Bonus tasks for extra credit (for individuals or pairs)
 1) Implement additional force function using Morse potential instead of Lennard-Jones
 2) Implement cell list for better scaling with system size

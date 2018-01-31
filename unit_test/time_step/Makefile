@@ -1,7 +1,7 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
 CC=gcc
-CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I $(HOME)/include
+CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -DCL -I $(HOME)/include
 LDLIBS=-lm
 HOME=../..
 
