@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 SHELL=/bin/sh
-CC= gcc-7
+CC= gcc
 CFLAGS=-Wall -g -O3 -ffast-math -fomit-frame-pointer -std=c11 -I ../include
 LDLIBS=-lm
 

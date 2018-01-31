@@ -43,9 +43,9 @@ void force(mdsys_t *sys)
     double epot = 0.0;
     #pragma omp parallel for default(shared) schedule(guided) private(ii, i, ffac, r2, r6, r12, rx, ry, rz, j) reduction(+:epot)
     #endif
-    for(ii = 0; ii < (sys->natoms - 1); ii += sys->size) {
+    for(ii = 0; ii < (sys->natoms); ii += sys->size) {
       i = ii + sys->rank;
-      if ( i  >= (sys->natoms - 1) )
+      if ( i  >= (sys->natoms ) )
         continue;
 #else
     azzero(sys->fx,sys->natoms);
@@ -74,9 +74,9 @@ void force(mdsys_t *sys)
 
           ffac = -4.0*sys->epsilon*(-12.0*r12+6*r6)*r2/sigma2; /*<-REDEFINED ffac,NO MORE pow*/
           #ifdef OPENMP
-          epot += 2.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
+          epot += 0.5 * 4.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
           #else
-          sys->epot += 2.0 *sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
+          sys->epot += 0.5 * 4.0 *sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
           #endif
 #ifdef MPI
           sys->cx[i] += rx*ffac;
