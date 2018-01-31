@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     mdsys_t sys;
 
     /* pre-filled sys with selected values */
-    sys.natoms = 10;
+    sys.natoms = 3;
     sys.mass = 39.948;
     sys.epsilon = 0.2379;
     sys.sigma = 3.405;

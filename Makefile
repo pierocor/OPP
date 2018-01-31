@@ -5,7 +5,7 @@ SHELL=/bin/sh
 OBJ_SERIAL=$(SRC:src/%.f90=Obj-serial/%.o)
 ############################################
 
-default: mpi
+default: serialx
 
 serial:
 	$(MAKE) $(MFLAGS) -C Obj-$@
@@ -24,7 +24,13 @@ clean:
 	$(MAKE) $(MFLAGS) -C unit_test/kinetic clean
 	$(MAKE) $(MFLAGS) -C unit_test/time_step clean
 	$(MAKE) $(MFLAGS) -C unit_test/input clean
+	$(MAKE) $(MFLAGS) -C Shared_objects clean
 
+py_wrapper:
+	$(MAKE) $(MFLAGS) -C Shared_objects shared
+
+py_check:
+	$(MAKE) $(MFLAGS) -C Shared_objects check
 
 check: serial
 	$(MAKE) $(MFLAGS) -C examples check
