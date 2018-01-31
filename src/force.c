@@ -4,7 +4,10 @@
 #include <velocity_verlet.h>
 #ifdef MPI
 #include <mpi.h>
-#define TAG 50
+#endif
+
+#ifdef OPENMP
+#include <omp.h>
 #endif
 
 /* helper function: apply minimum image convention */
@@ -36,17 +39,27 @@ void force(mdsys_t *sys)
     azzero(sys->cx,sys->natoms);
     azzero(sys->cy,sys->natoms);
     azzero(sys->cz,sys->natoms);
-    for(ii = 0; ii < (sys->natoms - 1); ii += sys->size) {   /// HEEEERRRREEEEEE!!!! HERE
+    #ifdef OPENMP
+    double epot = 0.0;
+    #pragma omp parallel for default(shared) schedule(guided) private(ii, i, ffac, r2, r6, r12, rx, ry, rz, j) reduction(+:epot)
+    #endif
+    for(ii = 0; ii < (sys->natoms); ii += sys->size) {
       i = ii + sys->rank;
-      if ( i >= (sys->natoms - 1) )
-        break;
+      if ( i  >= (sys->natoms ) )
+        continue;
 #else
     azzero(sys->fx,sys->natoms);
     azzero(sys->fy,sys->natoms);
     azzero(sys->fz,sys->natoms);
+    #ifdef OPENMP
+    double epot = 0.0;
+    #pragma omp parallel for default(shared) schedule(guided) private(i, ffac, r2, r6, r12, rx, ry, rz, j) reduction(+:epot)
+    #endif
     for(i=0; i < (sys->natoms); ++i) {
 #endif
-      for(j=i+1; j < (sys->natoms); ++j) {
+      for(j=0; j < (sys->natoms); ++j) {
+
+        if ( i == j ) continue;
         /* get distance between particle i and j */
         rx=pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
         ry=pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
@@ -60,20 +73,26 @@ void force(mdsys_t *sys)
           r12 = r6*r6; /* <-DEFINED R12 HERE */
 
           ffac = -4.0*sys->epsilon*(-12.0*r12+6*r6)*r2/sigma2; /*<-REDEFINED ffac,NO MORE pow*/
-
-          sys->epot += 4.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
+          #ifdef OPENMP
+          epot += 0.5 * 4.0*sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
+          #else
+          sys->epot += 0.5 * 4.0 *sys->epsilon*(r12-r6); /*REDEFINED epot, NO MORE pow */
+          #endif
 #ifdef MPI
-          sys->cx[i] += rx*ffac; sys->cx[j] -= rx*ffac;
-          sys->cy[i] += ry*ffac; sys->cy[j] -= ry*ffac;
-          sys->cz[i] += rz*ffac; sys->cz[j] -= rz*ffac;
+          sys->cx[i] += rx*ffac;
+          sys->cy[i] += ry*ffac;
+          sys->cz[i] += rz*ffac;
 #else
-          sys->fx[i] += rx*ffac; sys->fx[j] -= rx*ffac;
-          sys->fy[i] += ry*ffac; sys->fy[j] -= ry*ffac;
-          sys->fz[i] += rz*ffac; sys->fz[j] -= rz*ffac;
+          sys->fx[i] += rx*ffac;
+          sys->fy[i] += ry*ffac;
+          sys->fz[i] += rz*ffac;
 #endif
         }
       }
     }
+    #ifdef OPENMP
+    sys->epot = epot;
+    #endif
 #ifdef MPI
 
     MPI_Reduce( sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);

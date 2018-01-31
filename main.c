@@ -15,7 +15,10 @@
 
 #ifdef MPI
 #include <mpi.h>
-#define TAG 100
+#endif
+
+#ifdef OPENMP
+#include <omp.h>
 #endif
 
 /* a few physical constants */
